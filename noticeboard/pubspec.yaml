@@ -1,0 +1,33 @@
+name: noticeboard
+description: An accessible noticeboard for Coventry Resource Centre for the Blind.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.1.0-262.2.beta <4.0.0'
+
+dependencies:
+  audioplayers: ^5.0.0
+  backstreets_widgets: ^0.8.0
+  cupertino_icons: ^1.0.2
+  dio: ^5.3.1
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.3.6
+  flutter_tts: ^3.7.0
+  noticeboard_backend:
+    path: ../noticeboard_backend
+  path: ^1.8.3
+  path_provider: ^2.0.15
+
+
+
+dev_dependencies:
+  flutter_lints: ^2.0.0
+  flutter_test:
+    sdk: flutter
+
+
+flutter:
+  uses-material-design: true
