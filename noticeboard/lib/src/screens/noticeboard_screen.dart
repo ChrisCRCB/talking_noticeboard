@@ -66,7 +66,7 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
     }
     final notice = notices.removeAt(0);
     if (notices.isEmpty) {
-      downloadNotices();
+      downloadNotices(callSetState: false);
     }
     final text = notice.text ?? 'This notice has no text.';
     final audioPath = notice.audioPath;
@@ -106,12 +106,14 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
     _downloadTimer?.cancel();
     _downloadTimer = Timer.periodic(
       const Duration(minutes: 5),
-      (final timer) => downloadNotices(),
+      (final timer) => downloadNotices(callSetState: false),
     );
   }
 
   /// Download all notices.
-  Future<void> downloadNotices() async {
+  Future<void> downloadNotices({
+    final bool callSetState = true,
+  }) async {
     const url = '$baseUrl/notices/';
     final dio = ref.watch(dioProvider);
     final response = await dio.get<Map<String, dynamic>>(url);
@@ -120,7 +122,9 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
     if (data != null) {
       _notices.addAll(Notices.fromJson(data).notices);
     }
-    setState(() {});
+    if (callSetState) {
+      setState(() {});
+    }
   }
 
   /// Maybe call [setState].
