@@ -33,13 +33,30 @@ So long as the app can connect to the server, it will display notices whenever s
 
 Every effort has been made to keep users from inadvertently closing the app, but a home button, hardware or simulated, will still close the app.
 
-## Recommended COnfiguration
+## Recommended Configuration
 
 For best results with the app, I recommend the following configuration:
 
 - Disable screen lock.
 - Make sure the screen will never go automatically lock itself.
+- Set screen brightness and music volumes to a comfortable level.
 - Consider using an app like [MacroDroid](https://play.google.com/store/apps/details?id=com.arlosoft.macrodroid&hl=en_US) to re-open the app when it closes or is covered.
 - Turn off all device notifications
 
 I know this is obvious, but bears reiterating: You will be leaving a device lying about with 0 security on it. Make sure there is nothing sensitive on it.
+
+## Notices
+
+To create new notices, simple create a new folder in the notices folder you used when starting the server.
+
+In this folder, there should be either 1 text document (that is a plain text documented created in Windows Notepad or the like with a `.txt` extension), or a single MP3 file.
+
+If no text is available, then a default message will be used. This is definitely *not* what you want.
+
+If there is no MP3 file, then the device text-to-speech will be used instead.
+
+To remove notices from the noticeboard, just delete the folder containing the text and audio files.
+
+## Problems
+
+If you have any problems with this software, either [create an issue](https://github.com/ChrisCRCB/talking_noticeboard/issues/new), or send me an [email](chris@crcb.org.uk).
