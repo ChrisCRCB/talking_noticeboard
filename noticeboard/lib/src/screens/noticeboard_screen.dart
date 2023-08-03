@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:dio/dio.dart';
@@ -8,7 +9,11 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:noticeboard_backend/noticeboard_backend.dart';
 
 import '../../constants.dart';
+import '../../gen/assets.gen.dart';
 import '../providers/providers.dart';
+
+/// The random number generator to use.
+final random = Random();
 
 /// The notices screen.
 class NoticeboardScreen extends ConsumerStatefulWidget {
@@ -31,6 +36,9 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
   /// The timer for downloading notices.
   Timer? _downloadTimer;
 
+  /// The timer for playing instructions.
+  late Timer _instructionsTimer;
+
   /// The audio player to use.
   late final AudioPlayer _audioPlayer;
 
@@ -50,6 +58,7 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
     _audioPlayer = AudioPlayer(playerId: 'Noticeboard audio player');
     _notices = [];
     _tts = FlutterTts();
+    startInstructionsTimer(cancelFirst: false);
   }
 
   /// Dispose of things.
@@ -58,6 +67,7 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
     super.dispose();
     _downloadTimer?.cancel();
     _audioPlayer.dispose();
+    _instructionsTimer.cancel();
   }
 
   /// Build the widget.
@@ -150,7 +160,29 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
     final lastSetState = _lastSetState;
     if (lastSetState == null || now.difference(lastSetState) >= tapInterval) {
       _lastSetState = now;
+      startInstructionsTimer();
       setState(() {});
     }
+  }
+
+  /// Start the instructions timer.
+  void startInstructionsTimer({
+    final bool cancelFirst = true,
+  }) {
+    if (cancelFirst) {
+      _instructionsTimer.cancel();
+    }
+    _instructionsTimer = Timer.periodic(
+      const Duration(minutes: 15),
+      (final timer) async {
+        final assets = Assets.instructions.values;
+        final asset = assets[random.nextInt(assets.length)];
+        await _audioPlayer.play(
+          AssetSource(
+            asset.substring(_audioPlayer.audioCache.prefix.length),
+          ),
+        );
+      },
+    );
   }
 }
