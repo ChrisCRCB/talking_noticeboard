@@ -145,7 +145,7 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
       }
       _downloadTimer = Timer(
         const Duration(minutes: 15),
-        downloadNotices,
+        () => downloadNotices(callSetState: false),
       );
     } on DioException {
       final prefs = await ref.read(sharedPreferencesProvider.future);
