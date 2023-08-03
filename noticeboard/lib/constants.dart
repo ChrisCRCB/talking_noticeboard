@@ -1,5 +1,5 @@
-/// Base URL.
-const baseUrl = 'https://a474-92-27-9-37.ngrok-free.app';
-
 /// How often taps are accepted.
 const tapInterval = Duration(seconds: 3);
+
+/// The key for the URL in preferences.
+const urlPreferencesKey = 'talking_noticeboard_url';

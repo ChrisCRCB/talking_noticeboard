@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -13,8 +14,12 @@ import '../providers/providers.dart';
 class NoticeboardScreen extends ConsumerStatefulWidget {
   /// Create an instance.
   const NoticeboardScreen({
+    required this.baseUrl,
     super.key,
   });
+
+  /// The base URL to use.
+  final String baseUrl;
 
   /// Create state for this widget.
   @override
@@ -45,7 +50,6 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
     _audioPlayer = AudioPlayer(playerId: 'Noticeboard audio player');
     _notices = [];
     _tts = FlutterTts();
-    startDownloadTimer();
   }
 
   /// Dispose of things.
@@ -59,6 +63,7 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
   /// Build the widget.
   @override
   Widget build(final BuildContext context) {
+    final baseUrl = widget.baseUrl;
     final notices = _notices;
     if (notices.isEmpty) {
       downloadNotices();
@@ -86,6 +91,7 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
       child: GestureDetector(
         onTap: maybeSetState,
         onDoubleTap: maybeSetState,
+        onLongPress: maybeSetState,
         child: Semantics(
           liveRegion: true,
           child: Text(
@@ -101,29 +107,40 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
     );
   }
 
-  /// Start the download timer.
-  void startDownloadTimer() {
-    _downloadTimer?.cancel();
-    _downloadTimer = Timer.periodic(
-      const Duration(minutes: 5),
-      (final timer) => downloadNotices(callSetState: false),
-    );
-  }
-
   /// Download all notices.
   Future<void> downloadNotices({
     final bool callSetState = true,
   }) async {
-    const url = '$baseUrl/notices/';
+    final baseUrl = widget.baseUrl;
+    _downloadTimer?.cancel();
+    _downloadTimer = null;
+    final url = '$baseUrl/notices/';
     final dio = ref.watch(dioProvider);
-    final response = await dio.get<Map<String, dynamic>>(url);
-    final data = response.data;
-    _notices.clear();
-    if (data != null) {
-      _notices.addAll(Notices.fromJson(data).notices);
-    }
-    if (callSetState) {
-      setState(() {});
+    try {
+      final response = await dio.get<Map<String, dynamic>>(url);
+      final data = response.data;
+      _notices.clear();
+      if (data != null) {
+        _notices.addAll(Notices.fromJson(data).notices);
+      } else {
+        _notices.add(
+          const Notice(
+            text: 'There was an error downloading notices.',
+            audioPath: null,
+          ),
+        );
+      }
+      if (callSetState) {
+        setState(() {});
+      }
+      _downloadTimer = Timer(
+        const Duration(minutes: 15),
+        downloadNotices,
+      );
+    } on DioException {
+      final prefs = await ref.read(sharedPreferencesProvider.future);
+      await prefs.remove(urlPreferencesKey);
+      ref.invalidate(urlProvider);
     }
   }
 
@@ -133,7 +150,6 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
     final lastSetState = _lastSetState;
     if (lastSetState == null || now.difference(lastSetState) >= tapInterval) {
       _lastSetState = now;
-      startDownloadTimer();
       setState(() {});
     }
   }
