@@ -1,0 +1,28 @@
+name: commit_notices
+description: An app for committing notices to git.
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.1.0-262.2.beta <4.0.0"
+
+dependencies:
+  backstreets_widgets: ^0.8.0
+  cupertino_icons: ^1.0.2
+  file_picker: ^5.3.3
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.3.6
+  noticeboard_backend:
+    path: ../noticeboard_backend
+  path: ^1.8.3
+  shared_preferences: ^2.2.0
+
+dev_dependencies:
+  flutter_lints: ^2.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
