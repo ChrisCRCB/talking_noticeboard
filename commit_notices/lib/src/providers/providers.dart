@@ -1,4 +1,3 @@
-// ignore_for_file: avoid_print
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,8 +33,6 @@ final directoryChangesProvider =
           path.basename(relativePath) == noticesFilename) {
         continue;
       }
-      print(relativePath);
-      print(event);
       events.add(DatedFileSystemEvent(event: event, timestamp: DateTime.now()));
       yield events;
     }

@@ -1,4 +1,3 @@
-// ignore_for_file: avoid_print
 import 'dart:async';
 import 'dart:io';
 
@@ -125,11 +124,9 @@ class WatcherListViewState extends ConsumerState<WatcherListView> {
     }
     final json = jsonEncoder.convert(Notices(notices));
     File(path.join(directory.path, noticesFilename)).writeAsStringSync(json);
-    print('Generated JSON.');
     commitTimer = Timer(
       commitChangesAfter,
       () {
-        print('Committing.');
         if (mounted) {
           final code = runCommand(
             context: context,

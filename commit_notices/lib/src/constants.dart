@@ -31,7 +31,11 @@ int runCommand({
   required final String executable,
   required final List<String> arguments,
 }) {
-  final result = Process.runSync(executable, arguments);
+  final result = Process.runSync(
+    executable,
+    arguments,
+    workingDirectory: workingDirectory,
+  );
   if (result.exitCode != 0 && context.mounted) {
     pushWidget(
       context: context,
