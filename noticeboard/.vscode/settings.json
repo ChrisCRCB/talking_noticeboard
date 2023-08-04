@@ -3,6 +3,7 @@
         "audioplayers",
         "Color",
         "Colors",
+        "ngrok",
         "riverpod"
     ]
 }

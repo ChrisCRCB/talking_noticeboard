@@ -127,7 +127,15 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
     final url = '$baseUrl/notices.json';
     final dio = ref.watch(dioProvider);
     try {
-      final response = await dio.get<Map<String, dynamic>>(url);
+      final response = await dio.get<Map<String, dynamic>>(
+        url,
+        options: Options(
+          headers: {
+            // Skip ngrok's browser warning.
+            'ngrok-skip-browser-warning': '69420',
+          },
+        ),
+      );
       final data = response.data;
       _notices.clear();
       if (data != null) {
