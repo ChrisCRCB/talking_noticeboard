@@ -14,14 +14,19 @@ class MyApp extends StatelessWidget {
 
   // This widget is the root of your application.
   @override
-  Widget build(final BuildContext context) => MaterialApp(
-        title: 'Noticeboard',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
+  Widget build(final BuildContext context) {
+    WidgetsFlutterBinding.ensureInitialized();
+    return MaterialApp(
+      title: 'Noticeboard',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: ProviderScope(
+        child: Builder(
+          builder: (final context) => const MainScreen(),
         ),
-        home: const ProviderScope(
-          child: MainScreen(),
-        ),
-      );
+      ),
+    );
+  }
 }
