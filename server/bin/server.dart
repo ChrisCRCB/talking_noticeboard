@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:noticeboard_backend/noticeboard_backend.dart';
 import 'package:path/path.dart' as path;
+import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 import 'package:shelf_plus/shelf_plus.dart';
 
 /// The extension for text files.
@@ -17,6 +18,7 @@ void main(final List<String> arguments) {
   }
   shelfRun(
     () => initServer(arguments.single),
+    defaultBindAddress: InternetAddress.anyIPv4,
   );
 }
 
@@ -26,6 +28,7 @@ Handler initServer(final String directoryName) {
   final directory = Directory(directoryName);
   router
     ..use(logRequests())
+    ..use(corsHeaders())
     ..get('/notices/', () {
       final notices = <Notice>[];
       for (final subdirectory in directory.listSync().whereType<Directory>()) {
