@@ -29,7 +29,7 @@ Handler initServer(final String directoryName) {
   router
     ..use(logRequests())
     ..use(corsHeaders())
-    ..get('/notices/', () {
+    ..get('/notices.json', () {
       final notices = <Notice>[];
       for (final subdirectory in directory.listSync().whereType<Directory>()) {
         final files = subdirectory.listSync().whereType<File>();

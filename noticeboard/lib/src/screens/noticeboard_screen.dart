@@ -124,7 +124,7 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
     final baseUrl = widget.baseUrl;
     _downloadTimer?.cancel();
     _downloadTimer = null;
-    final url = '$baseUrl/notices/';
+    final url = '$baseUrl/notices.json';
     final dio = ref.watch(dioProvider);
     try {
       final response = await dio.get<Map<String, dynamic>>(url);
