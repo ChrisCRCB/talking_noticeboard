@@ -132,7 +132,7 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
         options: Options(
           headers: {
             // Skip ngrok's browser warning.
-            'ngrok-skip-browser-warning': '69420',
+            'ngrok-skip-browser-warning': true,
           },
         ),
       );
