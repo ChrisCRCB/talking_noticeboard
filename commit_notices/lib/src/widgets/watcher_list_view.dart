@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:backstreets_widgets/util.dart';
@@ -30,9 +29,6 @@ class WatcherListView extends ConsumerStatefulWidget {
 
 /// State for [WatcherListView].
 class WatcherListViewState extends ConsumerState<WatcherListView> {
-  /// The commit timer to use.
-  Timer? commitTimer;
-
   /// Build the widget.
   @override
   Widget build(final BuildContext context) {
@@ -84,8 +80,6 @@ class WatcherListViewState extends ConsumerState<WatcherListView> {
 
   /// Generate JSON.
   void generateJson() {
-    commitTimer?.cancel();
-    commitTimer = null;
     final directory = Directory(widget.path);
     final notices = <Notice>[];
     for (final subdirectory in directory.listSync().whereType<Directory>()) {
@@ -124,31 +118,5 @@ class WatcherListViewState extends ConsumerState<WatcherListView> {
     }
     final json = jsonEncoder.convert(Notices(notices));
     File(path.join(directory.path, noticesFilename)).writeAsStringSync(json);
-    commitTimer = Timer(
-      commitChangesAfter,
-      () {
-        if (mounted) {
-          final code = runCommand(
-            context: context,
-            workingDirectory: directory.path,
-            executable: 'git',
-            arguments: ['add', '-A'],
-          );
-          if (code == 0) {
-            runCommand(
-              context: context,
-              workingDirectory: directory.path,
-              executable: 'git',
-              arguments: [
-                'commit',
-                '-m',
-                'Automatically committed by commit_notices.',
-              ],
-            );
-          }
-        }
-        commitTimer = null;
-      },
-    );
   }
 }
