@@ -30,7 +30,8 @@ class UrlScreenState extends ConsumerState<UrlScreen> {
   @override
   void initState() {
     super.initState();
-    controller = TextEditingController();
+    controller =
+        TextEditingController(text: const String.fromEnvironment('url'));
     formKey = GlobalKey();
   }
 
