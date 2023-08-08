@@ -186,7 +186,9 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
         final assets = Assets.instructions.values;
         final asset = assets[random.nextInt(assets.length)];
         await _audioPlayer.setAsset(asset);
-        await _audioPlayer.play();
+        if (mounted) {
+          await _audioPlayer.play();
+        }
       },
     );
   }
