@@ -111,7 +111,12 @@ class WatcherListViewState extends ConsumerState<WatcherListView> {
             text: textFile?.readAsStringSync(),
             audioPath: audioFile == null
                 ? null
-                : Uri.encodeFull(path.basename(audioFile.parent.path)),
+                : Uri.encodeFull(
+                    [
+                      path.basename(audioFile.parent.path),
+                      path.basename(audioFile.path),
+                    ].join('/'),
+                  ),
           ),
         );
       }
