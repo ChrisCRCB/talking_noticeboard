@@ -4,5 +4,6 @@
         "Colors",
         "dialog",
         "riverpod"
-    ]
+    ],
+    "cmake.sourceDirectory": "C:/Users/chris/src/talking_noticeboard/commit_notices/windows"
 }
