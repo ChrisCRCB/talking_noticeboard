@@ -46,21 +46,25 @@ class UrlScreenState extends ConsumerState<UrlScreen> {
                 autofocus: true,
                 controller: controller,
                 decoration: const InputDecoration(labelText: 'Notices URL'),
+                onFieldSubmitted: (final value) => submitForm(),
                 validator: ValidationBuilder().url('Invalid URL').build(),
               ),
             ],
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            if (formKey.currentState?.validate() ?? false) {
-              final prefs = await ref.read(sharedPreferencesProvider.future);
-              await prefs.setString(urlPreferencesKey, controller.text);
-              ref.invalidate(urlProvider);
-            }
-          },
+          onPressed: submitForm,
           tooltip: 'Save',
           child: const Icon(Icons.save_rounded),
         ),
       );
+
+  /// Submit the form.
+  Future<void> submitForm() async {
+    if (formKey.currentState?.validate() ?? false) {
+      final prefs = await ref.read(sharedPreferencesProvider.future);
+      await prefs.setString(urlPreferencesKey, controller.text);
+      ref.invalidate(urlProvider);
+    }
+  }
 }
