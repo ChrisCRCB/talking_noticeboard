@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:noticeboard_backend/noticeboard_backend.dart';
@@ -84,32 +85,33 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
       downloadNotices(callSetState: false);
     }
     final text = notice.text ?? 'This notice has no text.';
+    _tts.stop();
     final audioPath = notice.audioPath;
-    if (audioPath != null) {
-      _tts.stop();
-      final url = '$baseUrl/audio/$audioPath/';
-      _audioPlayer.play(UrlSource(url));
-    } else {
-      _audioPlayer.stop();
-      _tts.speak(text);
-    }
-    return WillPopScope(
-      onWillPop: () {
-        maybeSetState();
-        return Future.value(false);
-      },
-      child: GestureDetector(
-        onTap: maybeSetState,
-        onDoubleTap: maybeSetState,
-        onLongPress: maybeSetState,
-        child: Semantics(
-          liveRegion: true,
-          child: Text(
-            text,
-            style: const TextStyle(
-              color: Colors.white,
-              decoration: TextDecoration.none,
-              fontSize: 40.0,
+    playOrSpeak(
+      baseUrl: baseUrl,
+      text: text,
+      audioPath: audioPath,
+    );
+    return CallbackShortcuts(
+      bindings: {const SingleActivator(LogicalKeyboardKey.keyR): maybeSetState},
+      child: WillPopScope(
+        onWillPop: () {
+          maybeSetState();
+          return Future.value(false);
+        },
+        child: GestureDetector(
+          onTap: maybeSetState,
+          onDoubleTap: maybeSetState,
+          onLongPress: maybeSetState,
+          child: Semantics(
+            liveRegion: true,
+            child: Text(
+              text,
+              style: const TextStyle(
+                color: Colors.white,
+                decoration: TextDecoration.none,
+                fontSize: 40.0,
+              ),
             ),
           ),
         ),
@@ -156,9 +158,11 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
         () => downloadNotices(callSetState: false),
       );
     } on DioException {
-      final prefs = await ref.read(sharedPreferencesProvider.future);
-      await prefs.remove(urlPreferencesKey);
-      ref.invalidate(urlProvider);
+      if (mounted) {
+        final prefs = await ref.read(sharedPreferencesProvider.future);
+        await prefs.remove(urlPreferencesKey);
+        ref.invalidate(urlProvider);
+      }
     }
   }
 
@@ -192,5 +196,28 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
         );
       },
     );
+  }
+
+  /// Either play [audioPath], or speak [text].
+  Future<void> playOrSpeak({
+    required final String baseUrl,
+    required final String text,
+    required final String? audioPath,
+  }) async {
+    await _audioPlayer.stop();
+    await _tts.stop();
+    if (audioPath != null) {
+      final url = '$baseUrl/$audioPath';
+      try {
+        await _audioPlayer.play(
+          UrlSource(url),
+          mode: PlayerMode.lowLatency,
+        );
+      } on PlatformException {
+        await _tts.speak(text);
+      }
+    } else {
+      await _tts.speak(text);
+    }
   }
 }
