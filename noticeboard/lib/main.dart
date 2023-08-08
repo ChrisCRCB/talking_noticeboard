@@ -16,16 +16,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(final BuildContext context) {
     WidgetsFlutterBinding.ensureInitialized();
-    return MaterialApp(
-      title: 'Noticeboard',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: ProviderScope(
-        child: Builder(
-          builder: (final context) => const MainScreen(),
+    return ProviderScope(
+      child: MaterialApp(
+        title: 'Noticeboard',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
         ),
+        home: const MainScreen(),
       ),
     );
   }
