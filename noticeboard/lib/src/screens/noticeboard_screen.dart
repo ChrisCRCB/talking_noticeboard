@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:noticeboard_backend/noticeboard_backend.dart';
 
 import '../../constants.dart';
@@ -56,7 +56,7 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
   @override
   void initState() {
     super.initState();
-    _audioPlayer = AudioPlayer(playerId: 'Noticeboard audio player');
+    _audioPlayer = AudioPlayer();
     _notices = [];
     _tts = FlutterTts();
     startInstructionsTimer(cancelFirst: false);
@@ -74,7 +74,6 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
   /// Build the widget.
   @override
   Widget build(final BuildContext context) {
-    final baseUrl = widget.baseUrl;
     final notices = _notices;
     if (notices.isEmpty) {
       downloadNotices();
@@ -85,12 +84,9 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
       downloadNotices(callSetState: false);
     }
     final text = notice.text ?? 'This notice has no text.';
-    _tts.stop();
-    final audioPath = notice.audioPath;
     playOrSpeak(
-      baseUrl: baseUrl,
       text: text,
-      audioPath: audioPath,
+      audioPath: notice.audioPath,
     );
     return CallbackShortcuts(
       bindings: {const SingleActivator(LogicalKeyboardKey.keyR): maybeSetState},
@@ -189,34 +185,32 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
       (final timer) async {
         final assets = Assets.instructions.values;
         final asset = assets[random.nextInt(assets.length)];
-        await _audioPlayer.play(
-          AssetSource(
-            asset.substring(_audioPlayer.audioCache.prefix.length),
-          ),
-        );
+        await _audioPlayer.setAsset(asset);
+        await _audioPlayer.play();
       },
     );
   }
 
   /// Either play [audioPath], or speak [text].
   Future<void> playOrSpeak({
-    required final String baseUrl,
     required final String text,
     required final String? audioPath,
   }) async {
-    await _audioPlayer.stop();
-    await _tts.stop();
     if (audioPath != null) {
-      final url = '$baseUrl/$audioPath';
+      final url = '${widget.baseUrl}/$audioPath';
       try {
-        await _audioPlayer.play(
-          UrlSource(url),
-          mode: PlayerMode.lowLatency,
+        await _audioPlayer.setUrl(
+          url,
+          headers: {'ngrok-skip-browser-warning': 'true'},
         );
-      } on PlatformException {
+        await _tts.stop();
+        await _audioPlayer.play();
+      } on PlayerException {
+        await _audioPlayer.stop();
         await _tts.speak(text);
       }
     } else {
+      await _audioPlayer.stop();
       await _tts.speak(text);
     }
   }
