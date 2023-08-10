@@ -17,6 +17,11 @@ final sharedPreferencesProvider = FutureProvider<SharedPreferences>(
 final urlProvider = FutureProvider<String?>(
   (final ref) async {
     final sharedPreferences = await ref.watch(sharedPreferencesProvider.future);
-    return sharedPreferences.getString(urlPreferencesKey);
+    final url = sharedPreferences.getString(urlPreferencesKey) ??
+        const String.fromEnvironment('url');
+    if (url.isEmpty) {
+      return null;
+    }
+    return url;
   },
 );
