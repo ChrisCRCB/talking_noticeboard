@@ -1,11 +1,11 @@
 import 'dart:io';
 
+import 'package:backstreets_widgets/shortcuts.dart';
 import 'package:backstreets_widgets/util.dart';
 import 'package:backstreets_widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:noticeboard_backend/noticeboard_backend.dart';
-import 'package:path/path.dart' as path;
 
 import '../constants.dart';
 import '../dated_file_system_event.dart';
@@ -35,15 +35,24 @@ class WatcherListViewState extends ConsumerState<WatcherListView> {
     final directory = Directory(widget.path);
     if (directory.existsSync()) {
       final value = ref.watch(directoryChangesProvider(widget.path));
-      return value.when(
-        data: (final events) {
-          if (events.isNotEmpty) {
-            generateJson();
-          }
-          return getListView(events);
+      return CallbackShortcuts(
+        bindings: {
+          SingleActivator(
+            LogicalKeyboardKey.keyR,
+            control: useControlKey,
+            meta: useMetaKey,
+          ): () => generateJson(directory),
         },
-        error: ErrorListView.withPositional,
-        loading: () => getListView([]),
+        child: value.when(
+          data: (final events) {
+            if (events.isNotEmpty) {
+              generateJson(directory);
+            }
+            return getListView(events);
+          },
+          error: ErrorListView.withPositional,
+          loading: () => getListView([]),
+        ),
       );
     }
     return const CenterText(
@@ -76,52 +85,5 @@ class WatcherListViewState extends ConsumerState<WatcherListView> {
       },
       itemCount: events.length,
     );
-  }
-
-  /// Generate JSON.
-  void generateJson() {
-    final directory = Directory(widget.path);
-    final notices = <Notice>[];
-    for (final subdirectory in directory.listSync().whereType<Directory>()) {
-      final files = subdirectory.listSync().whereType<File>();
-      if (files.isEmpty) {
-        continue;
-      }
-      File? textFile;
-      File? audioFile;
-      try {
-        textFile = files.firstWhere(
-          (final element) => path.extension(element.path) == textFileExtension,
-        );
-        // ignore: avoid_catching_errors
-      } on StateError {
-        // textFile = null;
-      }
-      try {
-        audioFile = files.firstWhere(
-          (final element) => path.extension(element.path) == audioFileExtension,
-        );
-        // ignore: avoid_catching_errors
-      } on StateError {
-        // audioFile = null;
-      }
-      if (textFile != null || audioFile != null) {
-        notices.add(
-          Notice(
-            text: textFile?.readAsStringSync(),
-            audioPath: audioFile == null
-                ? null
-                : Uri.encodeFull(
-                    [
-                      path.basename(audioFile.parent.path),
-                      path.basename(audioFile.path),
-                    ].join('/'),
-                  ),
-          ),
-        );
-      }
-    }
-    final json = jsonEncoder.convert(Notices(notices));
-    File(path.join(directory.path, noticesFilename)).writeAsStringSync(json);
   }
 }

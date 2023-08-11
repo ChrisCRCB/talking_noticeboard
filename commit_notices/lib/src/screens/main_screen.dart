@@ -44,6 +44,19 @@ class MainScreen extends ConsumerWidget {
                 (final e) {
                   final directory = Directory(e);
                   return TabbedScaffoldTab(
+                    actions: [
+                      ElevatedButton(
+                        child: const Icon(
+                          Icons.refresh,
+                          semanticLabel: 'Rebuild JSON',
+                        ),
+                        onPressed: () {
+                          if (directory.existsSync()) {
+                            generateJson(directory);
+                          }
+                        },
+                      ),
+                    ],
                     title: path.basename(e),
                     icon: Icon(
                       directory.existsSync()

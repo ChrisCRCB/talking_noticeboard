@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:backstreets_widgets/util.dart';
 import 'package:flutter/material.dart';
+import 'package:noticeboard_backend/noticeboard_backend.dart';
+import 'package:path/path.dart' as path;
 
 import 'screens/command_error_screen.dart';
 
@@ -47,4 +49,50 @@ int runCommand({
     );
   }
   return result.exitCode;
+}
+
+/// Generate JSON.
+void generateJson(final Directory directory) {
+  final notices = <Notice>[];
+  for (final subdirectory in directory.listSync().whereType<Directory>()) {
+    final files = subdirectory.listSync().whereType<File>();
+    if (files.isEmpty) {
+      continue;
+    }
+    File? textFile;
+    File? audioFile;
+    try {
+      textFile = files.firstWhere(
+        (final element) => path.extension(element.path) == textFileExtension,
+      );
+      // ignore: avoid_catching_errors
+    } on StateError {
+      // textFile = null;
+    }
+    try {
+      audioFile = files.firstWhere(
+        (final element) => path.extension(element.path) == audioFileExtension,
+      );
+      // ignore: avoid_catching_errors
+    } on StateError {
+      // audioFile = null;
+    }
+    if (textFile != null || audioFile != null) {
+      notices.add(
+        Notice(
+          text: textFile?.readAsStringSync(),
+          audioPath: audioFile == null
+              ? null
+              : Uri.encodeFull(
+                  [
+                    path.basename(audioFile.parent.path),
+                    path.basename(audioFile.path),
+                  ].join('/'),
+                ),
+        ),
+      );
+    }
+  }
+  final json = jsonEncoder.convert(Notices(notices));
+  File(path.join(directory.path, noticesFilename)).writeAsStringSync(json);
 }
