@@ -1,9 +1,12 @@
 {
     "cSpell.words": [
+        "APK",
         "audioplayers",
         "Color",
         "Colors",
+        "dhttpd",
         "ngrok",
-        "riverpod"
+        "riverpod",
+        "tts"
     ]
 }
