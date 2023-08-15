@@ -67,6 +67,8 @@ If there is no MP3 file, then the device text-to-speech will be used instead.
 
 To remove notices from the noticeboard, just delete the folder containing the text and audio files.
 
+Every time the notices change, a `notices.json` file must be generated. To help with this, the Commit Notices program has been created. You can find full source code in the `commit_notices` directory.
+
 ## Problems
 
 If you have any problems with this software, either [create an issue](https://github.com/ChrisCRCB/talking_noticeboard/issues/new), or send me an [email](chris@crcb.org.uk).
