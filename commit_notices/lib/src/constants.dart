@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:noticeboard_backend/noticeboard_backend.dart';
 import 'package:path/path.dart' as path;
 
+import 'command_context.dart';
 import 'screens/command_error_screen.dart';
 
 /// The key where the watched directories will be stored.
@@ -52,7 +54,7 @@ int runCommand({
 }
 
 /// Generate JSON.
-void generateJson(final Directory directory) {
+Timer? generateJson(final BuildContext context, final Directory directory) {
   final notices = <Notice>[];
   for (final subdirectory in directory.listSync().whereType<Directory>()) {
     final files = subdirectory.listSync().whereType<File>();
@@ -95,4 +97,34 @@ void generateJson(final Directory directory) {
   }
   final json = jsonEncoder.convert(Notices(notices));
   File(path.join(directory.path, noticesFilename)).writeAsStringSync(json);
+  final gitDirectory = Directory(path.join(directory.path, '.git'));
+  if (gitDirectory.existsSync()) {
+    return Timer(commitChangesAfter, () {
+      if (context.mounted) {
+        for (final commandContext in [
+          const CommandContext(command: 'git', arguments: ['add', '.']),
+          const CommandContext(
+            command: 'git',
+            arguments: [
+              'commit',
+              '-m',
+              'Automatically committed by commit_notices.',
+            ],
+          ),
+          const CommandContext(command: 'git', arguments: ['push']),
+        ]) {
+          if (runCommand(
+                context: context,
+                workingDirectory: directory.path,
+                executable: commandContext.command,
+                arguments: commandContext.arguments,
+              ) !=
+              0) {
+            return;
+          }
+        }
+      }
+    });
+  }
+  return null;
 }

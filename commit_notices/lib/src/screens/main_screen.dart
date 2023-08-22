@@ -52,7 +52,7 @@ class MainScreen extends ConsumerWidget {
                         ),
                         onPressed: () {
                           if (directory.existsSync()) {
-                            generateJson(directory);
+                            generateJson(context, directory);
                           }
                         },
                       ),

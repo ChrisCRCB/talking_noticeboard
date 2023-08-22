@@ -41,12 +41,12 @@ class WatcherListViewState extends ConsumerState<WatcherListView> {
             LogicalKeyboardKey.keyR,
             control: useControlKey,
             meta: useMetaKey,
-          ): () => generateJson(directory),
+          ): () => generateJson(context, directory),
         },
         child: value.when(
           data: (final events) {
             if (events.isNotEmpty) {
-              generateJson(directory);
+              generateJson(context, directory);
             }
             return getListView(events);
           },

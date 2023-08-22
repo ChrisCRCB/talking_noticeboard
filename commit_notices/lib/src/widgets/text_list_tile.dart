@@ -1,4 +1,5 @@
 import 'package:backstreets_widgets/util.dart';
+import 'package:backstreets_widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
 /// A widget that shows [text] in a [ListView].
@@ -17,6 +18,9 @@ class TextListView extends StatelessWidget {
   Widget build(final BuildContext context) {
     final value =
         text.split('\n').where((final element) => element.isNotEmpty).toList();
+    if (value.isEmpty) {
+      return const CenterText(text: 'There is nothing to show.');
+    }
     return ListView.builder(
       itemBuilder: (final context, final index) {
         final string = value[index];
