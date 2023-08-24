@@ -20,7 +20,15 @@ class MainScreen extends ConsumerWidget {
         if (baseUrl == null) {
           return const UrlScreen();
         }
-        return NoticeboardScreen(baseUrl: baseUrl);
+        final value = ref.watch(authorizationStringProvider);
+        return value.when(
+          data: (final authorizationString) => NoticeboardScreen(
+            baseUrl: baseUrl,
+            authorizationString: authorizationString,
+          ),
+          error: ErrorScreen.withPositional,
+          loading: LoadingScreen.new,
+        );
       },
       error: ErrorScreen.withPositional,
       loading: LoadingScreen.new,

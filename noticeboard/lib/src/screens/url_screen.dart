@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:backstreets_widgets/screens/simple_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,20 +22,44 @@ class UrlScreen extends ConsumerStatefulWidget {
 
 /// State for [UrlScreen].
 class UrlScreenState extends ConsumerState<UrlScreen> {
-  /// The text controller to use.
-  late final TextEditingController controller;
+  /// The text controller to use for the URL field.
+  late final TextEditingController urlController;
+
+  /// The controller to use for the authorization field.
+  late final TextEditingController authorizationController;
 
   /// The form key to use.
   late final GlobalKey<FormState> formKey;
 
-  /// Initialise [controller] and [formKey].
+  /// A timer to automatically connect.
+  late final Timer? connectTimer;
+
+  /// Initialise [urlController] and [formKey].
   @override
   void initState() {
     super.initState();
-    controller = TextEditingController(
+    urlController = TextEditingController(
       text: const String.fromEnvironment('url'),
     );
+    authorizationController = TextEditingController(
+      text: const String.fromEnvironment('authorization'),
+    );
     formKey = GlobalKey();
+    if (urlController.text.isNotEmpty) {
+      connectTimer = Timer(const Duration(seconds: 5), submitForm);
+    } else {
+      connectTimer = null;
+    }
+  }
+
+  /// Dispose of the widget.
+  @override
+  void dispose() {
+    super.dispose();
+    for (final controller in [urlController, authorizationController]) {
+      controller.dispose();
+    }
+    connectTimer?.cancel();
   }
 
   /// Build the widget.
@@ -46,10 +72,24 @@ class UrlScreenState extends ConsumerState<UrlScreen> {
             children: [
               TextFormField(
                 autofocus: true,
-                controller: controller,
+                controller: urlController,
                 decoration: const InputDecoration(labelText: 'Notices URL'),
                 onFieldSubmitted: (final value) => submitForm(),
                 validator: ValidationBuilder().url('Invalid URL').build(),
+              ),
+              TextFormField(
+                controller: authorizationController,
+                decoration: const InputDecoration(
+                  labelText: 'Authorization String',
+                ),
+                validator: (final value) {
+                  if (value == null || value.isEmpty) {
+                    return null;
+                  } else if (value.split(':').length != 2) {
+                    return 'Must be written as username:password';
+                  }
+                  return null;
+                },
               ),
             ],
           ),
@@ -65,8 +105,16 @@ class UrlScreenState extends ConsumerState<UrlScreen> {
   Future<void> submitForm() async {
     if (formKey.currentState?.validate() ?? false) {
       final prefs = await ref.read(sharedPreferencesProvider.future);
-      await prefs.setString(urlPreferencesKey, controller.text);
-      ref.invalidate(urlProvider);
+      await prefs.setString(urlPreferencesKey, urlController.text);
+      final authorizationString = authorizationController.text;
+      if (authorizationString.isEmpty) {
+        await prefs.remove(authorizationString);
+      } else {
+        await prefs.setString(authorizationPreferencesKey, authorizationString);
+      }
+      ref
+        ..invalidate(urlProvider)
+        ..invalidate(authorizationStringProvider);
     }
   }
 }

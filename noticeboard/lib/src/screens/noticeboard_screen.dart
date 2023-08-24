@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:dio/dio.dart';
@@ -21,11 +22,15 @@ class NoticeboardScreen extends ConsumerStatefulWidget {
   /// Create an instance.
   const NoticeboardScreen({
     required this.baseUrl,
+    required this.authorizationString,
     super.key,
   });
 
   /// The base URL to use.
   final String baseUrl;
+
+  /// The authorization string to use.
+  final String? authorizationString;
 
   /// Create state for this widget.
   @override
@@ -115,6 +120,27 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
     );
   }
 
+  /// Returns an authorization header, if required.
+  String? getAuthorizationHeader() {
+    final authorizationString = widget.authorizationString;
+    final authorizationBytes =
+        authorizationString == null ? null : utf8.encode(authorizationString);
+    if (authorizationBytes == null) {
+      return null;
+    }
+    return 'Basic ${base64Encode(authorizationBytes)}';
+  }
+
+  /// Get all headers.
+  Map<String, String> getHeaders() {
+    final authorizationHeader = getAuthorizationHeader();
+    return {
+      // Skip ngrok's browser warning.
+      'ngrok-skip-browser-warning': 'true',
+      if (authorizationHeader != null) 'Authorization': authorizationHeader,
+    };
+  }
+
   /// Download all notices.
   Future<void> downloadNotices({
     final bool callSetState = true,
@@ -129,10 +155,7 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
       final response = await dio.get<Map<String, dynamic>>(
         url,
         options: Options(
-          headers: {
-            // Skip ngrok's browser warning.
-            'ngrok-skip-browser-warning': true,
-          },
+          headers: getHeaders(),
         ),
       );
       final data = response.data;
@@ -158,8 +181,10 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
       if (mounted) {
         final prefs = await ref.read(sharedPreferencesProvider.future);
         await prefs.remove(urlPreferencesKey);
+        await prefs.remove(authorizationPreferencesKey);
         ref.invalidate(urlProvider);
       }
+      rethrow;
     }
   }
 
@@ -204,7 +229,7 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
       try {
         await _audioPlayer.setUrl(
           url,
-          headers: {'ngrok-skip-browser-warning': 'true'},
+          headers: getHeaders(),
         );
         await _tts.stop();
         await _audioPlayer.play();

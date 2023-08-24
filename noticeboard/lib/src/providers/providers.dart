@@ -17,11 +17,18 @@ final sharedPreferencesProvider = FutureProvider<SharedPreferences>(
 final urlProvider = FutureProvider<String?>(
   (final ref) async {
     final sharedPreferences = await ref.watch(sharedPreferencesProvider.future);
-    final url = sharedPreferences.getString(urlPreferencesKey) ??
-        const String.fromEnvironment('url');
-    if (url.isEmpty) {
+    final url = sharedPreferences.getString(urlPreferencesKey);
+    if (url == null || url.isEmpty) {
       return null;
     }
     return url;
+  },
+);
+
+/// Provide the authorization string.
+final authorizationStringProvider = FutureProvider<String?>(
+  (final ref) async {
+    final sharedPreferences = await ref.watch(sharedPreferencesProvider.future);
+    return sharedPreferences.getString(authorizationPreferencesKey);
   },
 );
