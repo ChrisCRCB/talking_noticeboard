@@ -104,6 +104,7 @@ class NoticeboardScreenState extends ConsumerState<NoticeboardScreen> {
           onTap: maybeSetState,
           onDoubleTap: maybeSetState,
           onLongPress: maybeSetState,
+          onHorizontalDragStart: (final details) => maybeSetState(),
           child: Semantics(
             liveRegion: true,
             child: Text(
