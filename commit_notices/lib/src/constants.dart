@@ -34,13 +34,15 @@ int runCommand({
   required final String workingDirectory,
   required final String executable,
   required final List<String> arguments,
+  final List<int> ignoredStatusCodes = const [],
 }) {
   final result = Process.runSync(
     executable,
     arguments,
     workingDirectory: workingDirectory,
   );
-  if (result.exitCode != 0 && context.mounted) {
+  if ((result.exitCode != 0 && !ignoredStatusCodes.contains(result.exitCode)) &&
+      context.mounted) {
     pushWidget(
       context: context,
       builder: (final context) => CommandErrorScreen(
@@ -118,6 +120,7 @@ Timer? generateJson(final BuildContext context, final Directory directory) {
                 workingDirectory: directory.path,
                 executable: commandContext.command,
                 arguments: commandContext.arguments,
+                ignoredStatusCodes: [1],
               ) !=
               0) {
             return;
