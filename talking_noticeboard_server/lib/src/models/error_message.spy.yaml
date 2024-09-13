@@ -1,0 +1,5 @@
+### An error message to send to clients.
+exception: ErrorMessage
+fields:
+  ### The message to show.
+  message: String, default="An error has occurred."

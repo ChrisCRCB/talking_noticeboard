@@ -1,0 +1,12 @@
+### A notice in the noticeboard.
+class: Notice
+table: notices
+fields:
+  ### The person who created this notice.
+  userInfo: module:auth:UserInfo?, relation
+  ### When this notice was created.
+  createdAt: DateTime, default=now
+  ### The text of the notice.
+  text: String
+  ### The filename of the sound file to send.
+  filename: String

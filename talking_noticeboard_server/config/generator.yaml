@@ -1,0 +1,6 @@
+type: server
+
+client_package_path: ../talking_noticeboard_client
+modules:
+  serverpod_auth:
+    nickname: auth

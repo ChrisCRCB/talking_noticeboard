@@ -1,0 +1,5 @@
+notices:
+  - addNotice:
+  - deleteNotice:
+  - getNotices:
+  - getSoundBytes:
