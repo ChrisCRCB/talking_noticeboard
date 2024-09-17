@@ -84,7 +84,7 @@ class NoticesEndpoint extends Endpoint {
       throw ErrorMessage(message: 'You cannot delete $notice without an ID.');
     }
     if (await session.storage
-        .fileExists(storageId: 'notice', path: notice.path)) {
+        .fileExists(storageId: noticeStorageId, path: notice.path)) {
       await session.storage.deleteFile(
         storageId: noticeStorageId,
         path: notice.path,
