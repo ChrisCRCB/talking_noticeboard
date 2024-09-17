@@ -20,6 +20,7 @@ dependencies:
   form_builder_validators: ^11.0.0
   path: ^1.9.0
   path_provider: ^2.1.4
+  serverpod_auth_client: 2.1.1
   serverpod_auth_email_flutter: 2.1.1
   serverpod_auth_shared_flutter: 2.1.1
   serverpod_flutter: 2.1.1

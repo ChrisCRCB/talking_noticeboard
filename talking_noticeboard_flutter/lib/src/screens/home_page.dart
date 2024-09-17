@@ -63,7 +63,6 @@ class HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _sessionManagerInitialised = false;
-    sessionManager.addListener(() => setState(() {}));
     page = PageToShow.unset;
     _remainingSeconds = widget.initialSeconds;
     timer = Timer.periodic(const Duration(seconds: 1), (final t) {
