@@ -96,6 +96,15 @@ class NoticesEndpoint extends Endpoint {
     );
   }
 
+  /// Get the public URL for a sound with the given [path].
+  Future<String?> getSoundUrl(final Session session, final String path) async {
+    final uri = await session.storage.getPublicUrl(
+      storageId: noticeStorageId,
+      path: path,
+    );
+    return uri.toString();
+  }
+
   /// Get the contents of a sound file.
   Future<ByteData?> getSoundBytes(
     final Session session,

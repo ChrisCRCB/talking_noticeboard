@@ -106,6 +106,24 @@ class Endpoints extends _i1.EndpointDispatch {
           ) async =>
               (endpoints['notices'] as _i2.NoticesEndpoint).getNotices(session),
         ),
+        'getSoundUrl': _i1.MethodConnector(
+          name: 'getSoundUrl',
+          params: {
+            'path': _i1.ParameterDescription(
+              name: 'path',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['notices'] as _i2.NoticesEndpoint).getSoundUrl(
+            session,
+            params['path'],
+          ),
+        ),
         'getSoundBytes': _i1.MethodConnector(
           name: 'getSoundBytes',
           params: {
