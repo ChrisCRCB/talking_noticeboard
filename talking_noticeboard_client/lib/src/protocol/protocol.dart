@@ -51,6 +51,15 @@ class Protocol extends _i1.SerializationManager {
       return (data as List).map((e) => deserialize<_i4.Notice>(e)).toList()
           as dynamic;
     }
+    if (t == _i1.getType<List<String>?>()) {
+      return (data != null
+          ? (data as List).map((e) => deserialize<String>(e)).toList()
+          : null) as dynamic;
+    }
+    if (t == List<String>) {
+      return (data as List).map((e) => deserialize<String>(e)).toList()
+          as dynamic;
+    }
     try {
       return _i5.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}

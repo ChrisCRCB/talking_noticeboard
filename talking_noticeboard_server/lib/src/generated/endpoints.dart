@@ -11,8 +11,9 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../endpoints/notices_endpoint.dart' as _i2;
-import 'package:talking_noticeboard_server/src/generated/notice.dart' as _i3;
-import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i4;
+import '../endpoints/users_endpoint.dart' as _i3;
+import 'package:talking_noticeboard_server/src/generated/notice.dart' as _i4;
+import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i5;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -23,7 +24,13 @@ class Endpoints extends _i1.EndpointDispatch {
           server,
           'notices',
           null,
-        )
+        ),
+      'users': _i3.UsersEndpoint()
+        ..initialize(
+          server,
+          'users',
+          null,
+        ),
     };
     connectors['notices'] = _i1.EndpointConnector(
       name: 'notices',
@@ -58,7 +65,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'notice': _i1.ParameterDescription(
               name: 'notice',
-              type: _i1.getType<_i3.Notice>(),
+              type: _i1.getType<_i4.Notice>(),
               nullable: false,
             )
           },
@@ -100,6 +107,63 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
-    modules['serverpod_auth'] = _i4.Endpoints()..initializeEndpoints(server);
+    connectors['users'] = _i1.EndpointConnector(
+      name: 'users',
+      endpoint: endpoints['users']!,
+      methodConnectors: {
+        'getScopeNames': _i1.MethodConnector(
+          name: 'getScopeNames',
+          params: {
+            'email': _i1.ParameterDescription(
+              name: 'email',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['users'] as _i3.UsersEndpoint).getScopeNames(
+            session,
+            params['email'],
+          ),
+        ),
+        'getScopes': _i1.MethodConnector(
+          name: 'getScopes',
+          params: {},
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['users'] as _i3.UsersEndpoint).getScopes(session),
+        ),
+        'updateScopes': _i1.MethodConnector(
+          name: 'updateScopes',
+          params: {
+            'email': _i1.ParameterDescription(
+              name: 'email',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'scopes': _i1.ParameterDescription(
+              name: 'scopes',
+              type: _i1.getType<List<String>>(),
+              nullable: false,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['users'] as _i3.UsersEndpoint).updateScopes(
+            session,
+            params['email'],
+            params['scopes'],
+          ),
+        ),
+      },
+    );
+    modules['serverpod_auth'] = _i5.Endpoints()..initializeEndpoints(server);
   }
 }
