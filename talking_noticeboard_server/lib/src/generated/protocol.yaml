@@ -3,7 +3,6 @@ notices:
   - addNotice:
   - deleteNotice:
   - getNotices:
-  - getSoundUrl:
   - getSoundBytes:
 users:
   - getScopeNames:
