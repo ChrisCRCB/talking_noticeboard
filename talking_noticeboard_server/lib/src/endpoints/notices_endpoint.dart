@@ -106,9 +106,18 @@ class NoticesEndpoint extends Endpoint {
   }
 
   /// Get the contents of a sound file.
-  Future<ByteData?> getSoundBytes(
+  Future<ByteData> getSoundBytes(
     final Session session,
     final String path,
-  ) =>
-      session.storage.retrieveFile(storageId: noticeStorageId, path: path);
+  ) async {
+    if (await session.storage
+        .fileExists(storageId: noticeStorageId, path: path)) {
+      final bytes = await session.storage.retrieveFile(
+        storageId: noticeStorageId,
+        path: path,
+      );
+      return bytes!;
+    }
+    throw ErrorMessage(message: 'File does not exist: $path.');
+  }
 }

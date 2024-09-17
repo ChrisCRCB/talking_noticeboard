@@ -71,8 +71,8 @@ class EndpointNotices extends _i1.EndpointRef {
       );
 
   /// Get the contents of a sound file.
-  _i2.Future<_i4.ByteData?> getSoundBytes(String path) =>
-      caller.callServerEndpoint<_i4.ByteData?>(
+  _i2.Future<_i4.ByteData> getSoundBytes(String path) =>
+      caller.callServerEndpoint<_i4.ByteData>(
         'notices',
         'getSoundBytes',
         {'path': path},
