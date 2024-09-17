@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_audio_games/flutter_audio_games.dart';
+import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
@@ -37,7 +38,11 @@ class MyApp extends StatelessWidget {
           file.writeAsBytesSync(bytes.buffer.asUint8List());
         }
         return sourceLoader.loadSound(
-          sound.copyWith(soundType: SoundType.file),
+          sound.copyWith(
+            soundType: SoundType.file,
+            path: file.path,
+            loadMode: LoadMode.disk,
+          ),
         );
       },
       child: MaterialApp(

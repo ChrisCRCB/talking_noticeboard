@@ -5,6 +5,7 @@ import 'package:backstreets_widgets/util.dart';
 import 'package:backstreets_widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_audio_games/flutter_audio_games.dart';
 import 'package:talking_noticeboard_client/talking_noticeboard_client.dart';
 
 import '../client.dart';
@@ -102,17 +103,23 @@ class NoticesScreenState extends State<NoticesScreen> {
                     final notice = notices[index];
                     return CommonShortcuts(
                       deleteCallback: () => deleteNotice(notice),
-                      child: ListTile(
-                        autofocus: true,
-                        title: Text(
-                          notice.userInfo?.userIdentifier ?? 'Unknown',
-                          style: const TextStyle(fontSize: 20),
+                      child: PlaySoundSemantics(
+                        sound: notice.path.asSound(
+                          destroy: false,
+                          soundType: SoundType.custom,
                         ),
-                        subtitle: Text(
-                          notice.text,
-                          style: const TextStyle(fontSize: 20),
+                        child: ListTile(
+                          autofocus: true,
+                          title: Text(
+                            notice.userInfo?.userIdentifier ?? 'Unknown',
+                            style: const TextStyle(fontSize: 20),
+                          ),
+                          subtitle: Text(
+                            notice.text,
+                            style: const TextStyle(fontSize: 20),
+                          ),
+                          onTap: () => deleteNotice(notice),
                         ),
-                        onTap: () => deleteNotice(notice),
                       ),
                     );
                   },
