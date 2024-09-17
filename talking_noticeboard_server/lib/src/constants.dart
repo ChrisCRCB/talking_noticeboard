@@ -5,4 +5,4 @@ const String addNotices = 'add-notice';
 const String deleteNotices = 'delete-notice';
 
 /// The storage key for notice sound files.
-const noticeStorageId = 'notice';
+const noticeStorageId = 'public';
