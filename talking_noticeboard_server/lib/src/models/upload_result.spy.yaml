@@ -1,0 +1,7 @@
+### The result of uploading a file.
+class: UploadResult
+fields:
+  ### The upload description.
+  description: String
+  ### The path where the file exists.
+  path: String

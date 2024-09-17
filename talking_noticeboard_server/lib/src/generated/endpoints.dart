@@ -36,6 +36,25 @@ class Endpoints extends _i1.EndpointDispatch {
       name: 'notices',
       endpoint: endpoints['notices']!,
       methodConnectors: {
+        'createUploadDescription': _i1.MethodConnector(
+          name: 'createUploadDescription',
+          params: {
+            'path': _i1.ParameterDescription(
+              name: 'path',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['notices'] as _i2.NoticesEndpoint)
+                  .createUploadDescription(
+            session,
+            params['path'],
+          ),
+        ),
         'addNotice': _i1.MethodConnector(
           name: 'addNotice',
           params: {
@@ -44,9 +63,9 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<String>(),
               nullable: false,
             ),
-            'soundBytes': _i1.ParameterDescription(
-              name: 'soundBytes',
-              type: _i1.getType<List<int>>(),
+            'path': _i1.ParameterDescription(
+              name: 'path',
+              type: _i1.getType<String>(),
               nullable: false,
             ),
           },
@@ -57,7 +76,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (endpoints['notices'] as _i2.NoticesEndpoint).addNotice(
             session,
             text: params['text'],
-            soundBytes: params['soundBytes'],
+            path: params['path'],
           ),
         ),
         'deleteNotice': _i1.MethodConnector(
@@ -90,8 +109,8 @@ class Endpoints extends _i1.EndpointDispatch {
         'getSoundBytes': _i1.MethodConnector(
           name: 'getSoundBytes',
           params: {
-            'filename': _i1.ParameterDescription(
-              name: 'filename',
+            'path': _i1.ParameterDescription(
+              name: 'path',
               type: _i1.getType<String>(),
               nullable: false,
             )
@@ -102,7 +121,7 @@ class Endpoints extends _i1.EndpointDispatch {
           ) async =>
               (endpoints['notices'] as _i2.NoticesEndpoint).getSoundBytes(
             session,
-            params['filename'],
+            params['path'],
           ),
         ),
       },

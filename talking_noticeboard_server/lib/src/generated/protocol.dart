@@ -15,9 +15,11 @@ import 'package:serverpod/protocol.dart' as _i2;
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i3;
 import 'error_message.dart' as _i4;
 import 'notice.dart' as _i5;
-import 'package:talking_noticeboard_server/src/generated/notice.dart' as _i6;
+import 'upload_result.dart' as _i6;
+import 'package:talking_noticeboard_server/src/generated/notice.dart' as _i7;
 export 'error_message.dart';
 export 'notice.dart';
+export 'upload_result.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
   Protocol._();
@@ -60,11 +62,10 @@ class Protocol extends _i1.SerializationManagerServer {
           dartType: 'String',
         ),
         _i2.ColumnDefinition(
-          name: 'filename',
-          columnType: _i2.ColumnType.uuid,
+          name: 'path',
+          columnType: _i2.ColumnType.text,
           isNullable: false,
-          dartType: 'UuidValue',
-          columnDefault: 'gen_random_uuid()',
+          dartType: 'String',
         ),
       ],
       foreignKeys: [
@@ -112,17 +113,20 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i5.Notice) {
       return _i5.Notice.fromJson(data) as T;
     }
+    if (t == _i6.UploadResult) {
+      return _i6.UploadResult.fromJson(data) as T;
+    }
     if (t == _i1.getType<_i4.ErrorMessage?>()) {
       return (data != null ? _i4.ErrorMessage.fromJson(data) : null) as T;
     }
     if (t == _i1.getType<_i5.Notice?>()) {
       return (data != null ? _i5.Notice.fromJson(data) : null) as T;
     }
-    if (t == List<int>) {
-      return (data as List).map((e) => deserialize<int>(e)).toList() as dynamic;
+    if (t == _i1.getType<_i6.UploadResult?>()) {
+      return (data != null ? _i6.UploadResult.fromJson(data) : null) as T;
     }
-    if (t == List<_i6.Notice>) {
-      return (data as List).map((e) => deserialize<_i6.Notice>(e)).toList()
+    if (t == List<_i7.Notice>) {
+      return (data as List).map((e) => deserialize<_i7.Notice>(e)).toList()
           as dynamic;
     }
     if (t == _i1.getType<List<String>?>()) {
@@ -153,6 +157,9 @@ class Protocol extends _i1.SerializationManagerServer {
     if (data is _i5.Notice) {
       return 'Notice';
     }
+    if (data is _i6.UploadResult) {
+      return 'UploadResult';
+    }
     className = _i2.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod.$className';
@@ -171,6 +178,9 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (data['className'] == 'Notice') {
       return deserialize<_i5.Notice>(data['data']);
+    }
+    if (data['className'] == 'UploadResult') {
+      return deserialize<_i6.UploadResult>(data['data']);
     }
     if (data['className'].startsWith('serverpod.')) {
       data['className'] = data['className'].substring(10);

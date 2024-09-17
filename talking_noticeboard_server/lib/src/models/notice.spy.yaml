@@ -8,5 +8,5 @@ fields:
   createdAt: DateTime, default=now
   ### The text of the notice.
   text: String
-  ### The filename of the sound file to send.
-  filename: UuidValue, default=random
+  ### The path where the uploaded sound lives.
+  path: String

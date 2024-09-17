@@ -12,8 +12,9 @@
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'dart:async' as _i2;
 import 'package:talking_noticeboard_client/src/protocol/notice.dart' as _i3;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i4;
-import 'protocol.dart' as _i5;
+import 'dart:typed_data' as _i4;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i5;
+import 'protocol.dart' as _i6;
 
 /// The endpoint for notices.
 /// {@category Endpoint}
@@ -23,17 +24,25 @@ class EndpointNotices extends _i1.EndpointRef {
   @override
   String get name => 'notices';
 
+  /// Create a new file upload description.
+  _i2.Future<String?> createUploadDescription(String path) =>
+      caller.callServerEndpoint<String?>(
+        'notices',
+        'createUploadDescription',
+        {'path': path},
+      );
+
   /// Add a notice.
   _i2.Future<_i3.Notice> addNotice({
     required String text,
-    required List<int> soundBytes,
+    required String path,
   }) =>
       caller.callServerEndpoint<_i3.Notice>(
         'notices',
         'addNotice',
         {
           'text': text,
-          'soundBytes': soundBytes,
+          'path': path,
         },
       );
 
@@ -54,11 +63,11 @@ class EndpointNotices extends _i1.EndpointRef {
       );
 
   /// Get the contents of a sound file.
-  _i2.Future<List<int>> getSoundBytes(String filename) =>
-      caller.callServerEndpoint<List<int>>(
+  _i2.Future<_i4.ByteData?> getSoundBytes(String path) =>
+      caller.callServerEndpoint<_i4.ByteData?>(
         'notices',
         'getSoundBytes',
-        {'filename': filename},
+        {'path': path},
       );
 }
 
@@ -103,10 +112,10 @@ class EndpointUsers extends _i1.EndpointRef {
 
 class _Modules {
   _Modules(Client client) {
-    auth = _i4.Caller(client);
+    auth = _i5.Caller(client);
   }
 
-  late final _i4.Caller auth;
+  late final _i5.Caller auth;
 }
 
 class Client extends _i1.ServerpodClientShared {
@@ -125,7 +134,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
           host,
-          _i5.Protocol(),
+          _i6.Protocol(),
           securityContext: securityContext,
           authenticationKeyManager: authenticationKeyManager,
           streamingConnectionTimeout: streamingConnectionTimeout,

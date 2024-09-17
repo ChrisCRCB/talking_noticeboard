@@ -1,6 +1,5 @@
-import 'dart:io';
+import 'dart:typed_data';
 
-import 'package:path/path.dart' as path;
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 
@@ -39,37 +38,50 @@ class NoticesEndpoint extends Endpoint {
     }
   }
 
+  /// Create a new file upload description.
+  Future<String?> createUploadDescription(
+    final Session session,
+    final String path,
+  ) =>
+      session.storage.createDirectFileUploadDescription(
+        storageId: noticeStorageId,
+        path: path,
+      );
+
   /// Add a notice.
   Future<Notice> addNotice(
     final Session session, {
     required final String text,
-    required final List<int> soundBytes,
+    required final String path,
   }) async {
     final userInfo = await session.requireScopes([addNotices]);
-    if (!soundsDirectory.existsSync()) {
-      soundsDirectory.createSync(recursive: true);
+    if (!(await session.storage
+        .fileExists(storageId: noticeStorageId, path: path))) {
+      throw ErrorMessage(message: 'You must first upload a sound file.');
     }
     final notice = await Notice.db.insertRow(
       session,
       Notice(
         userInfoId: userInfo.id!,
         text: text,
+        path: path,
       ),
     );
-    final fullPath = path.join(soundsDirectory.path, notice.filename.uuid);
-    File(fullPath).writeAsBytesSync(soundBytes);
-    return notice;
+    return notice.copyWith(userInfo: userInfo);
   }
 
   /// Delete [notice].
   Future<void> deleteNotice(final Session session, final Notice notice) async {
+    await session.requireScopes([deleteNotices]);
     if (notice.id != null) {
       throw ErrorMessage(message: 'You cannot delete $notice without an ID.');
     }
-    final fullPath = path.join(soundsDirectory.path, notice.filename.uuid);
-    final file = File(fullPath);
-    if (file.existsSync()) {
-      file.deleteSync(recursive: true);
+    if (await session.storage
+        .fileExists(storageId: 'notice', path: notice.path)) {
+      await session.storage.deleteFile(
+        storageId: noticeStorageId,
+        path: notice.path,
+      );
     }
     await Notice.db.deleteRow(session, notice);
   }
@@ -81,11 +93,9 @@ class NoticesEndpoint extends Endpoint {
   }
 
   /// Get the contents of a sound file.
-  Future<List<int>> getSoundBytes(
+  Future<ByteData?> getSoundBytes(
     final Session session,
-    final String filename,
-  ) async {
-    final fullPath = path.join(soundsDirectory.path, filename);
-    return File(fullPath).readAsBytesSync();
-  }
+    final String path,
+  ) =>
+      session.storage.retrieveFile(storageId: noticeStorageId, path: path);
 }
