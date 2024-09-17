@@ -1,3 +1,4 @@
+import 'package:backstreets_widgets/extensions.dart';
 import 'package:backstreets_widgets/screens.dart';
 import 'package:backstreets_widgets/shortcuts.dart';
 import 'package:backstreets_widgets/widgets.dart';
@@ -7,6 +8,7 @@ import 'package:talking_noticeboard_client/talking_noticeboard_client.dart';
 
 import '../client.dart';
 import 'account_screen.dart';
+import 'create_notice_screen.dart';
 
 /// A [ListView] which shows notices.
 class NoticesScreen extends StatefulWidget {
@@ -80,7 +82,10 @@ class NoticesScreenState extends State<NoticesScreen> {
         title: 'Notices',
         body: RefreshIndicator(
           child: notices.isEmpty
-              ? const CenterText(text: 'There are no notices to show.')
+              ? const CenterText(
+                  text: 'There are no notices to show.',
+                  autofocus: true,
+                )
               : ListViewBuilder(
                   itemBuilder: (final context, final index) {
                     final notice = notices[index];
@@ -152,5 +157,13 @@ class NoticesScreenState extends State<NoticesScreen> {
       });
 
   /// Create a new notice.
-  void newNotice() {}
+  void newNotice() => context.pushWidgetBuilder(
+        (final _) => CreateNoticeScreen(
+          onDone: (final notice) {
+            _notices ??= [];
+            _notices!.add(notice);
+            setState(() {});
+          },
+        ),
+      );
 }

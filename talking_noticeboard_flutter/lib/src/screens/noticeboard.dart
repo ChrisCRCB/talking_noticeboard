@@ -112,7 +112,7 @@ class NoticeboardState extends State<Noticeboard> {
       context
           .playSound(
             Sound(
-              path: notice.filename,
+              path: notice.filename.uuid,
               soundType: SoundType.custom,
               destroy: false,
             ),
