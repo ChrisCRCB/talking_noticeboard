@@ -42,11 +42,6 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<List<int>>(),
               nullable: false,
             ),
-            'filename': _i1.ParameterDescription(
-              name: 'filename',
-              type: _i1.getType<String>(),
-              nullable: false,
-            ),
           },
           call: (
             _i1.Session session,
@@ -56,7 +51,6 @@ class Endpoints extends _i1.EndpointDispatch {
             session,
             text: params['text'],
             soundBytes: params['soundBytes'],
-            filename: params['filename'],
           ),
         ),
         'deleteNotice': _i1.MethodConnector(

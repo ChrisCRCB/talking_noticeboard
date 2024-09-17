@@ -1,0 +1,91 @@
+{
+  "moduleName": "talking_noticeboard",
+  "tables": [
+    {
+      "name": "notices",
+      "dartName": "Notice",
+      "module": "talking_noticeboard",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "id",
+          "columnType": 6,
+          "isNullable": false,
+          "columnDefault": "nextval('notices_id_seq'::regclass)",
+          "dartType": "int?"
+        },
+        {
+          "name": "userInfoId",
+          "columnType": 6,
+          "isNullable": false,
+          "dartType": "int"
+        },
+        {
+          "name": "createdAt",
+          "columnType": 4,
+          "isNullable": false,
+          "columnDefault": "CURRENT_TIMESTAMP",
+          "dartType": "DateTime"
+        },
+        {
+          "name": "text",
+          "columnType": 0,
+          "isNullable": false,
+          "dartType": "String"
+        },
+        {
+          "name": "filename",
+          "columnType": 7,
+          "isNullable": false,
+          "columnDefault": "gen_random_uuid()",
+          "dartType": "UuidValue"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "constraintName": "notices_fk_0",
+          "columns": [
+            "userInfoId"
+          ],
+          "referenceTable": "serverpod_user_info",
+          "referenceTableSchema": "public",
+          "referenceColumns": [
+            "id"
+          ],
+          "onUpdate": 3,
+          "onDelete": 3
+        }
+      ],
+      "indexes": [
+        {
+          "indexName": "notices_pkey",
+          "elements": [
+            {
+              "type": 0,
+              "definition": "id"
+            }
+          ],
+          "type": "btree",
+          "isUnique": true,
+          "isPrimary": true
+        }
+      ],
+      "managed": true
+    }
+  ],
+  "installedModules": [
+    {
+      "module": "serverpod",
+      "version": "20240516151843329"
+    },
+    {
+      "module": "serverpod_auth",
+      "version": "20240520102713718"
+    },
+    {
+      "module": "talking_noticeboard",
+      "version": "20240913141220930"
+    }
+  ],
+  "migrationApiVersion": 1
+}

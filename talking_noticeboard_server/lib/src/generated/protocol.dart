@@ -61,9 +61,10 @@ class Protocol extends _i1.SerializationManagerServer {
         ),
         _i2.ColumnDefinition(
           name: 'filename',
-          columnType: _i2.ColumnType.text,
+          columnType: _i2.ColumnType.uuid,
           isNullable: false,
-          dartType: 'String',
+          dartType: 'UuidValue',
+          columnDefault: 'gen_random_uuid()',
         ),
       ],
       foreignKeys: [

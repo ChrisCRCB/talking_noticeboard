@@ -10,7 +10,8 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
-import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i2;
+import 'package:uuid/uuid.dart' as _i2;
+import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i3;
 
 /// A notice in the noticeboard.
 abstract class Notice extends _i1.TableRow
@@ -21,17 +22,18 @@ abstract class Notice extends _i1.TableRow
     this.userInfo,
     DateTime? createdAt,
     required this.text,
-    required this.filename,
+    _i1.UuidValue? filename,
   })  : createdAt = createdAt ?? DateTime.now(),
+        filename = filename ?? _i2.Uuid().v4obj(),
         super(id);
 
   factory Notice({
     int? id,
     required int userInfoId,
-    _i2.UserInfo? userInfo,
+    _i3.UserInfo? userInfo,
     DateTime? createdAt,
     required String text,
-    required String filename,
+    _i1.UuidValue? filename,
   }) = _NoticeImpl;
 
   factory Notice.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -40,12 +42,13 @@ abstract class Notice extends _i1.TableRow
       userInfoId: jsonSerialization['userInfoId'] as int,
       userInfo: jsonSerialization['userInfo'] == null
           ? null
-          : _i2.UserInfo.fromJson(
+          : _i3.UserInfo.fromJson(
               (jsonSerialization['userInfo'] as Map<String, dynamic>)),
       createdAt:
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
       text: jsonSerialization['text'] as String,
-      filename: jsonSerialization['filename'] as String,
+      filename:
+          _i1.UuidValueJsonExtension.fromJson(jsonSerialization['filename']),
     );
   }
 
@@ -56,7 +59,7 @@ abstract class Notice extends _i1.TableRow
   int userInfoId;
 
   /// The person who created this notice.
-  _i2.UserInfo? userInfo;
+  _i3.UserInfo? userInfo;
 
   /// When this notice was created.
   DateTime createdAt;
@@ -65,7 +68,7 @@ abstract class Notice extends _i1.TableRow
   String text;
 
   /// The filename of the sound file to send.
-  String filename;
+  _i1.UuidValue filename;
 
   @override
   _i1.Table get table => t;
@@ -73,10 +76,10 @@ abstract class Notice extends _i1.TableRow
   Notice copyWith({
     int? id,
     int? userInfoId,
-    _i2.UserInfo? userInfo,
+    _i3.UserInfo? userInfo,
     DateTime? createdAt,
     String? text,
-    String? filename,
+    _i1.UuidValue? filename,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -86,7 +89,7 @@ abstract class Notice extends _i1.TableRow
       if (userInfo != null) 'userInfo': userInfo?.toJson(),
       'createdAt': createdAt.toJson(),
       'text': text,
-      'filename': filename,
+      'filename': filename.toJson(),
     };
   }
 
@@ -98,11 +101,11 @@ abstract class Notice extends _i1.TableRow
       if (userInfo != null) 'userInfo': userInfo?.toJsonForProtocol(),
       'createdAt': createdAt.toJson(),
       'text': text,
-      'filename': filename,
+      'filename': filename.toJson(),
     };
   }
 
-  static NoticeInclude include({_i2.UserInfoInclude? userInfo}) {
+  static NoticeInclude include({_i3.UserInfoInclude? userInfo}) {
     return NoticeInclude._(userInfo: userInfo);
   }
 
@@ -138,10 +141,10 @@ class _NoticeImpl extends Notice {
   _NoticeImpl({
     int? id,
     required int userInfoId,
-    _i2.UserInfo? userInfo,
+    _i3.UserInfo? userInfo,
     DateTime? createdAt,
     required String text,
-    required String filename,
+    _i1.UuidValue? filename,
   }) : super._(
           id: id,
           userInfoId: userInfoId,
@@ -158,13 +161,13 @@ class _NoticeImpl extends Notice {
     Object? userInfo = _Undefined,
     DateTime? createdAt,
     String? text,
-    String? filename,
+    _i1.UuidValue? filename,
   }) {
     return Notice(
       id: id is int? ? id : this.id,
       userInfoId: userInfoId ?? this.userInfoId,
       userInfo:
-          userInfo is _i2.UserInfo? ? userInfo : this.userInfo?.copyWith(),
+          userInfo is _i3.UserInfo? ? userInfo : this.userInfo?.copyWith(),
       createdAt: createdAt ?? this.createdAt,
       text: text ?? this.text,
       filename: filename ?? this.filename,
@@ -187,16 +190,17 @@ class NoticeTable extends _i1.Table {
       'text',
       this,
     );
-    filename = _i1.ColumnString(
+    filename = _i1.ColumnUuid(
       'filename',
       this,
+      hasDefault: true,
     );
   }
 
   late final _i1.ColumnInt userInfoId;
 
   /// The person who created this notice.
-  _i2.UserInfoTable? _userInfo;
+  _i3.UserInfoTable? _userInfo;
 
   /// When this notice was created.
   late final _i1.ColumnDateTime createdAt;
@@ -205,17 +209,17 @@ class NoticeTable extends _i1.Table {
   late final _i1.ColumnString text;
 
   /// The filename of the sound file to send.
-  late final _i1.ColumnString filename;
+  late final _i1.ColumnUuid filename;
 
-  _i2.UserInfoTable get userInfo {
+  _i3.UserInfoTable get userInfo {
     if (_userInfo != null) return _userInfo!;
     _userInfo = _i1.createRelationTable(
       relationFieldName: 'userInfo',
       field: Notice.t.userInfoId,
-      foreignField: _i2.UserInfo.t.id,
+      foreignField: _i3.UserInfo.t.id,
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
-          _i2.UserInfoTable(tableRelation: foreignTableRelation),
+          _i3.UserInfoTable(tableRelation: foreignTableRelation),
     );
     return _userInfo!;
   }
@@ -239,11 +243,11 @@ class NoticeTable extends _i1.Table {
 }
 
 class NoticeInclude extends _i1.IncludeObject {
-  NoticeInclude._({_i2.UserInfoInclude? userInfo}) {
+  NoticeInclude._({_i3.UserInfoInclude? userInfo}) {
     _userInfo = userInfo;
   }
 
-  _i2.UserInfoInclude? _userInfo;
+  _i3.UserInfoInclude? _userInfo;
 
   @override
   Map<String, _i1.Include?> get includes => {'userInfo': _userInfo};
@@ -435,7 +439,7 @@ class NoticeAttachRowRepository {
   Future<void> userInfo(
     _i1.Session session,
     Notice notice,
-    _i2.UserInfo userInfo, {
+    _i3.UserInfo userInfo, {
     _i1.Transaction? transaction,
   }) async {
     if (notice.id == null) {

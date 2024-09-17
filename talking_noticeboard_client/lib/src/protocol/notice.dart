@@ -10,7 +10,8 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i2;
+import 'package:uuid/uuid.dart' as _i2;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i3;
 
 /// A notice in the noticeboard.
 abstract class Notice implements _i1.SerializableModel {
@@ -20,16 +21,17 @@ abstract class Notice implements _i1.SerializableModel {
     this.userInfo,
     DateTime? createdAt,
     required this.text,
-    required this.filename,
-  }) : createdAt = createdAt ?? DateTime.now();
+    _i1.UuidValue? filename,
+  })  : createdAt = createdAt ?? DateTime.now(),
+        filename = filename ?? _i2.Uuid().v4obj();
 
   factory Notice({
     int? id,
     required int userInfoId,
-    _i2.UserInfo? userInfo,
+    _i3.UserInfo? userInfo,
     DateTime? createdAt,
     required String text,
-    required String filename,
+    _i1.UuidValue? filename,
   }) = _NoticeImpl;
 
   factory Notice.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -38,12 +40,13 @@ abstract class Notice implements _i1.SerializableModel {
       userInfoId: jsonSerialization['userInfoId'] as int,
       userInfo: jsonSerialization['userInfo'] == null
           ? null
-          : _i2.UserInfo.fromJson(
+          : _i3.UserInfo.fromJson(
               (jsonSerialization['userInfo'] as Map<String, dynamic>)),
       createdAt:
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
       text: jsonSerialization['text'] as String,
-      filename: jsonSerialization['filename'] as String,
+      filename:
+          _i1.UuidValueJsonExtension.fromJson(jsonSerialization['filename']),
     );
   }
 
@@ -55,7 +58,7 @@ abstract class Notice implements _i1.SerializableModel {
   int userInfoId;
 
   /// The person who created this notice.
-  _i2.UserInfo? userInfo;
+  _i3.UserInfo? userInfo;
 
   /// When this notice was created.
   DateTime createdAt;
@@ -64,15 +67,15 @@ abstract class Notice implements _i1.SerializableModel {
   String text;
 
   /// The filename of the sound file to send.
-  String filename;
+  _i1.UuidValue filename;
 
   Notice copyWith({
     int? id,
     int? userInfoId,
-    _i2.UserInfo? userInfo,
+    _i3.UserInfo? userInfo,
     DateTime? createdAt,
     String? text,
-    String? filename,
+    _i1.UuidValue? filename,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -82,7 +85,7 @@ abstract class Notice implements _i1.SerializableModel {
       if (userInfo != null) 'userInfo': userInfo?.toJson(),
       'createdAt': createdAt.toJson(),
       'text': text,
-      'filename': filename,
+      'filename': filename.toJson(),
     };
   }
 
@@ -98,10 +101,10 @@ class _NoticeImpl extends Notice {
   _NoticeImpl({
     int? id,
     required int userInfoId,
-    _i2.UserInfo? userInfo,
+    _i3.UserInfo? userInfo,
     DateTime? createdAt,
     required String text,
-    required String filename,
+    _i1.UuidValue? filename,
   }) : super._(
           id: id,
           userInfoId: userInfoId,
@@ -118,13 +121,13 @@ class _NoticeImpl extends Notice {
     Object? userInfo = _Undefined,
     DateTime? createdAt,
     String? text,
-    String? filename,
+    _i1.UuidValue? filename,
   }) {
     return Notice(
       id: id is int? ? id : this.id,
       userInfoId: userInfoId ?? this.userInfoId,
       userInfo:
-          userInfo is _i2.UserInfo? ? userInfo : this.userInfo?.copyWith(),
+          userInfo is _i3.UserInfo? ? userInfo : this.userInfo?.copyWith(),
       createdAt: createdAt ?? this.createdAt,
       text: text ?? this.text,
       filename: filename ?? this.filename,

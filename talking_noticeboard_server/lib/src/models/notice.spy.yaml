@@ -9,4 +9,4 @@ fields:
   ### The text of the notice.
   text: String
   ### The filename of the sound file to send.
-  filename: String
+  filename: UuidValue, default=random

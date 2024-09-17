@@ -44,18 +44,21 @@ class NoticesEndpoint extends Endpoint {
     final Session session, {
     required final String text,
     required final List<int> soundBytes,
-    required final String filename,
   }) async {
     final userInfo = await session.requireScopes([addNotices]);
     if (!soundsDirectory.existsSync()) {
       soundsDirectory.createSync(recursive: true);
     }
-    final fullPath = path.join(soundsDirectory.path, filename);
-    File(fullPath).writeAsBytesSync(soundBytes);
-    return Notice.db.insertRow(
+    final notice = await Notice.db.insertRow(
       session,
-      Notice(userInfoId: userInfo.id!, text: text, filename: filename),
+      Notice(
+        userInfoId: userInfo.id!,
+        text: text,
+      ),
     );
+    final fullPath = path.join(soundsDirectory.path, notice.filename.uuid);
+    File(fullPath).writeAsBytesSync(soundBytes);
+    return notice;
   }
 
   /// Delete [notice].
@@ -63,8 +66,11 @@ class NoticesEndpoint extends Endpoint {
     if (notice.id != null) {
       throw ErrorMessage(message: 'You cannot delete $notice without an ID.');
     }
-    final fullPath = path.join(soundsDirectory.path, notice.filename);
-    File(fullPath).deleteSync(recursive: true);
+    final fullPath = path.join(soundsDirectory.path, notice.filename.uuid);
+    final file = File(fullPath);
+    if (file.existsSync()) {
+      file.deleteSync(recursive: true);
+    }
     await Notice.db.deleteRow(session, notice);
   }
 

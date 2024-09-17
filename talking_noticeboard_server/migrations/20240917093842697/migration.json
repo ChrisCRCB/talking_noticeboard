@@ -1,0 +1,51 @@
+{
+  "actions": [
+    {
+      "type": "alterTable",
+      "alterTable": {
+        "name": "notices",
+        "schema": "public",
+        "addColumns": [
+          {
+            "name": "filename",
+            "columnType": 7,
+            "isNullable": false,
+            "columnDefault": "gen_random_uuid()",
+            "dartType": "UuidValue"
+          }
+        ],
+        "deleteColumns": [
+          "filename"
+        ],
+        "modifyColumns": [],
+        "addIndexes": [],
+        "deleteIndexes": [],
+        "addForeignKeys": [],
+        "deleteForeignKeys": [],
+        "warnings": [
+          {
+            "type": "columnDropped",
+            "message": "Column filename of table notices is modified in a way that it must be deleted and recreated.",
+            "table": "notices",
+            "columns": [
+              "filename"
+            ],
+            "destrucive": true
+          }
+        ]
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "type": "columnDropped",
+      "message": "Column filename of table notices is modified in a way that it must be deleted and recreated.",
+      "table": "notices",
+      "columns": [
+        "filename"
+      ],
+      "destrucive": true
+    }
+  ],
+  "migrationApiVersion": 1
+}

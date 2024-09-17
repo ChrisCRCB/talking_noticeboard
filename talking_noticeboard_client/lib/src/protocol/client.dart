@@ -27,7 +27,6 @@ class EndpointNotices extends _i1.EndpointRef {
   _i2.Future<_i3.Notice> addNotice({
     required String text,
     required List<int> soundBytes,
-    required String filename,
   }) =>
       caller.callServerEndpoint<_i3.Notice>(
         'notices',
@@ -35,7 +34,6 @@ class EndpointNotices extends _i1.EndpointRef {
         {
           'text': text,
           'soundBytes': soundBytes,
-          'filename': filename,
         },
       );
 
