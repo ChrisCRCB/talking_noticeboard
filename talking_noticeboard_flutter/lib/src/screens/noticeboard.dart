@@ -7,8 +7,9 @@ import 'package:flutter_audio_games/flutter_audio_games.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:talking_noticeboard_client/talking_noticeboard_client.dart';
 
-import '../../../../gen/assets.gen.dart';
+import '../../gen/assets.gen.dart';
 import '../client.dart';
+import '../widgets/custom_text.dart';
 
 /// A [ListView] which shows notices.
 class Noticeboard extends StatefulWidget {
@@ -66,6 +67,14 @@ class NoticeboardState extends State<Noticeboard> {
   Widget build(final BuildContext context) {
     final error = _error;
     if (error != null) {
+      Timer(
+        const Duration(seconds: 30),
+        () => setState(() {
+          _error = null;
+          _stackTrace = null;
+          _notices = null;
+        }),
+      );
       return ErrorScreen(
         error: error,
         stackTrace: _stackTrace,
@@ -78,6 +87,8 @@ class NoticeboardState extends State<Noticeboard> {
           .getNotices()
           .then(
             (final value) => setState(() {
+              _error = null;
+              _stackTrace = null;
               _lastLoaded = DateTime.now();
               _notices = value;
             }),
@@ -89,7 +100,7 @@ class NoticeboardState extends State<Noticeboard> {
     if (notices.isEmpty) {
       _notices = null;
       child = const Material(
-        child: AutoSizeText('There are no notices to show.'),
+        child: CustomText('There are no notices to show.'),
       );
     } else {
       if (index >= notices.length) {
@@ -107,9 +118,7 @@ class NoticeboardState extends State<Noticeboard> {
             ),
           )
           .then((final soundHandle) => _soundHandle = soundHandle)
-          .onError(
-            handleError,
-          );
+          .onError(handleError);
       child = Material(
         child: AutoSizeText(notice.text),
       );
@@ -118,9 +127,13 @@ class NoticeboardState extends State<Noticeboard> {
       autofocus: true,
       onKeyEvent: (final node, final event) {
         final lastSkip = _lastSkip;
+        final now = DateTime.now();
         if (lastSkip == null ||
-            DateTime.now().difference(lastSkip) > widget.skipNoticesDuration) {
-          setState(() => index++);
+            now.difference(lastSkip) > widget.skipNoticesDuration) {
+          setState(() {
+            _lastSkip = now;
+            index++;
+          });
         }
         return KeyEventResult.handled;
       },

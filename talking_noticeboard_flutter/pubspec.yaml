@@ -10,6 +10,7 @@ environment:
   flutter: '>=3.19.0'
 
 dependencies:
+  auto_size_text: ^3.0.0
   backstreets_widgets: ^0.16.0
   cupertino_icons: ^1.0.5
   flutter:
@@ -33,3 +34,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - sounds/
