@@ -34,7 +34,12 @@ class MyApp extends StatelessWidget {
         final file = File(path.join(appDocumentsDirectory.path, sound.path));
         if (!file.existsSync()) {
           final bytes = await client.notices.getSoundBytes(sound.path);
-          file.writeAsBytesSync(bytes);
+          if (bytes == null) {
+            throw StateError(
+              'Cannot retrieve sound ${sound.path}: Method returned null.',
+            );
+          }
+          file.writeAsBytesSync(bytes.buffer.asUint8List());
         }
         return sourceLoader.loadSound(
           sound.copyWith(soundType: SoundType.file),

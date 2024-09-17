@@ -9,6 +9,7 @@ import 'package:talking_noticeboard_client/talking_noticeboard_client.dart';
 import '../client.dart';
 import 'account_screen.dart';
 import 'create_notice_screen.dart';
+import 'update_user_screen.dart';
 
 /// A [ListView] which shows notices.
 class NoticesScreen extends StatefulWidget {
@@ -78,7 +79,16 @@ class NoticesScreenState extends State<NoticesScreen> {
       );
     } else {
       child = SimpleScaffold(
-        actions: [refreshButton],
+        actions: [
+          IconButton(
+            onPressed: updateUser,
+            icon: const Icon(
+              Icons.edit,
+              semanticLabel: 'Edit Users',
+            ),
+          ),
+          refreshButton,
+        ],
         title: 'Notices',
         body: RefreshIndicator(
           child: notices.isEmpty
@@ -135,6 +145,11 @@ class NoticesScreenState extends State<NoticesScreen> {
           control: useControlKey,
           meta: useMetaKey,
         ): newNotice,
+        SingleActivator(
+          LogicalKeyboardKey.keyU,
+          control: useControlKey,
+          meta: useMetaKey,
+        ): updateUser,
       },
       child: child,
     );
@@ -166,4 +181,8 @@ class NoticesScreenState extends State<NoticesScreen> {
           },
         ),
       );
+
+  /// Update a user.
+  Future<void> updateUser() async =>
+      context.pushWidgetBuilder((final _) => const UpdateUserScreen());
 }

@@ -6,10 +6,15 @@ import 'package:backstreets_widgets/widgets.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:path/path.dart' as path;
 import 'package:talking_noticeboard_client/talking_noticeboard_client.dart';
 
 import '../client.dart';
+import '../sound_file.dart';
 import '../widgets/custom_text.dart';
+
+/// The UUID generator to use.
+const uuid = Uuid();
 
 /// A screen for adding a new notice.
 class CreateNoticeScreen extends StatefulWidget {
@@ -35,8 +40,8 @@ class CreateNoticeScreenState extends State<CreateNoticeScreen> {
   /// The controller for the notice text.
   late final TextEditingController noticeTextController;
 
-  /// The bytes of a loaded sound.
-  List<int>? soundFileBytes;
+  /// The sound file to upload.
+  SoundFile? _soundFile;
 
   /// Initialise state.
   @override
@@ -63,17 +68,43 @@ class CreateNoticeScreenState extends State<CreateNoticeScreen> {
                 if (!(formKey.currentState?.validate() ?? false)) {
                   return;
                 }
-                final bytes = soundFileBytes;
-                if (bytes == null || bytes.isEmpty) {
+                final soundFile = _soundFile;
+                if (soundFile == null) {
                   return showMessage(
                     context: context,
                     message: 'You must choose a sound file.',
                   );
                 }
                 try {
+                  final uploadDescription =
+                      await client.notices.createUploadDescription(
+                    soundFile.path,
+                  );
+                  if (uploadDescription == null) {
+                    if (context.mounted) {
+                      await showMessage(
+                        context: context,
+                        message: 'Failed to create file.',
+                      );
+                    }
+                    return;
+                  }
+                  final uploader = FileUploader(uploadDescription);
+                  final result = await uploader.upload(
+                    Stream.fromIterable([soundFile.bytes]),
+                    soundFile.bytes.length,
+                  );
+                  if (!result) {
+                    if (context.mounted) {
+                      await showMessage(
+                        context: context,
+                        message: 'Failed to upload file.',
+                      );
+                    }
+                  }
                   final notice = await client.notices.addNotice(
                     text: noticeTextController.text,
-                    soundBytes: bytes,
+                    path: soundFile.path,
                   );
                   if (context.mounted) {
                     Navigator.pop(context);
@@ -84,6 +115,11 @@ class CreateNoticeScreenState extends State<CreateNoticeScreen> {
                     await showMessage(context: context, message: e.message);
                   }
                   return;
+                  // ignore: avoid_catches_without_on_clauses
+                } catch (e, s) {
+                  if (context.mounted) {
+                    await showMessage(context: context, message: '$e\n$s');
+                  }
                 }
               },
               child: const Icon(
@@ -115,12 +151,16 @@ class CreateNoticeScreenState extends State<CreateNoticeScreen> {
                       return;
                     }
                     final file = result.files.single;
-                    final path = file.path;
+                    final filePath = file.path;
                     final List<int> bytes;
-                    if (path != null) {
-                      bytes = File(path).readAsBytesSync();
+                    final String uploadPath;
+                    if (filePath != null) {
+                      bytes = File(filePath).readAsBytesSync();
+                      final extension = path.extension(filePath);
+                      uploadPath = '${uuid.v4()}$extension';
                     } else if (file.bytes != null) {
                       bytes = file.bytes!;
+                      uploadPath = file.name;
                     } else {
                       if (context.mounted) {
                         await showMessage(
@@ -131,13 +171,11 @@ class CreateNoticeScreenState extends State<CreateNoticeScreen> {
                       return;
                     }
                     setState(() {
-                      soundFileBytes = bytes;
+                      _soundFile = SoundFile(path: uploadPath, bytes: bytes);
                     });
                   },
                   child: CustomText(
-                    soundFileBytes == null
-                        ? 'Set sound file'
-                        : 'Change sound file',
+                    _soundFile == null ? 'Set sound file' : 'Change sound file',
                   ),
                 ),
               ],
