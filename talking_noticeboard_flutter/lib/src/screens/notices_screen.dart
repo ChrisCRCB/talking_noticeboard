@@ -100,30 +100,19 @@ class NoticesScreenState extends State<NoticesScreen> {
               : ListViewBuilder(
                   itemBuilder: (final context, final index) {
                     final notice = notices[index];
-                    return ListTile(
-                      autofocus: true,
-                      title: Text(
-                        notice.userInfo?.userIdentifier ?? 'Unknown',
-                        style: const TextStyle(fontSize: 20),
-                      ),
-                      subtitle: Text(
-                        notice.text,
-                        style: const TextStyle(fontSize: 20),
-                      ),
-                      onTap: () => confirm(
-                        context: context,
-                        message: 'Really delete this notice?',
-                        title: 'Delete Notice',
-                        yesCallback: () async {
-                          Navigator.pop(context);
-                          try {
-                            await client.notices.deleteNotice(notice);
-                            _notices!.remove(notice);
-                            // ignore: avoid_catches_without_on_clauses
-                          } catch (e, s) {
-                            handleError(e, s);
-                          }
-                        },
+                    return CommonShortcuts(
+                      deleteCallback: () => deleteNotice(notice),
+                      child: ListTile(
+                        autofocus: true,
+                        title: Text(
+                          notice.userInfo?.userIdentifier ?? 'Unknown',
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                        subtitle: Text(
+                          notice.text,
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                        onTap: () => deleteNotice(notice),
                       ),
                     );
                   },
@@ -200,4 +189,23 @@ class NoticesScreenState extends State<NoticesScreen> {
   /// Update a user.
   Future<void> updateUser() async =>
       context.pushWidgetBuilder((final _) => const UpdateUserScreen());
+
+  /// Delete [notice].
+  Future<void> deleteNotice(final Notice notice) => confirm(
+        context: context,
+        message: 'Really delete this notice?',
+        title: 'Delete Notice',
+        yesCallback: () async {
+          Navigator.pop(context);
+          try {
+            await client.notices.deleteNotice(notice);
+            setState(() {
+              _notices = null;
+            });
+            // ignore: avoid_catches_without_on_clauses
+          } catch (e, s) {
+            handleError(e, s);
+          }
+        },
+      );
 }
