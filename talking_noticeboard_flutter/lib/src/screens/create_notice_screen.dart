@@ -151,24 +151,14 @@ class CreateNoticeScreenState extends State<CreateNoticeScreen> {
                       return;
                     }
                     final file = result.files.single;
-                    final filePath = file.path;
+                    final filePath = file.name;
                     final List<int> bytes;
-                    final String uploadPath;
-                    if (filePath != null) {
+                    final extension = path.extension(filePath);
+                    final uploadPath = '${uuid.v4()}$extension';
+                    if (file.bytes == null) {
                       bytes = File(filePath).readAsBytesSync();
-                      final extension = path.extension(filePath);
-                      uploadPath = '${uuid.v4()}$extension';
-                    } else if (file.bytes != null) {
-                      bytes = file.bytes!;
-                      uploadPath = file.name;
                     } else {
-                      if (context.mounted) {
-                        await showMessage(
-                          context: context,
-                          message: 'Could not load the file.',
-                        );
-                      }
-                      return;
+                      bytes = file.bytes!;
                     }
                     setState(() {
                       _soundFile = SoundFile(path: uploadPath, bytes: bytes);
