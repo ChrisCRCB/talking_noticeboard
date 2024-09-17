@@ -38,6 +38,13 @@ class NoticesEndpoint extends Endpoint {
     }
   }
 
+  /// Return `true` if [path] has been uploaded.
+  Future<bool> verifyUpload(final Session session, final String path) async =>
+      session.storage.verifyDirectFileUpload(
+        storageId: noticeStorageId,
+        path: path,
+      );
+
   /// Create a new file upload description.
   Future<String?> createUploadDescription(
     final Session session,

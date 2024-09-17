@@ -36,6 +36,24 @@ class Endpoints extends _i1.EndpointDispatch {
       name: 'notices',
       endpoint: endpoints['notices']!,
       methodConnectors: {
+        'verifyUpload': _i1.MethodConnector(
+          name: 'verifyUpload',
+          params: {
+            'path': _i1.ParameterDescription(
+              name: 'path',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['notices'] as _i2.NoticesEndpoint).verifyUpload(
+            session,
+            params['path'],
+          ),
+        ),
         'createUploadDescription': _i1.MethodConnector(
           name: 'createUploadDescription',
           params: {

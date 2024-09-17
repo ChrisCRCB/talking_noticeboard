@@ -24,6 +24,13 @@ class EndpointNotices extends _i1.EndpointRef {
   @override
   String get name => 'notices';
 
+  /// Return `true` if [path] has been uploaded.
+  _i2.Future<bool> verifyUpload(String path) => caller.callServerEndpoint<bool>(
+        'notices',
+        'verifyUpload',
+        {'path': path},
+      );
+
   /// Create a new file upload description.
   _i2.Future<String?> createUploadDescription(String path) =>
       caller.callServerEndpoint<String?>(

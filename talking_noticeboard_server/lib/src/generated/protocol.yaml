@@ -1,4 +1,5 @@
 notices:
+  - verifyUpload:
   - createUploadDescription:
   - addNotice:
   - deleteNotice:
