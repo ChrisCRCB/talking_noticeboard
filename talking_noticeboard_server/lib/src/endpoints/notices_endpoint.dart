@@ -89,7 +89,11 @@ class NoticesEndpoint extends Endpoint {
   /// List all notices.
   Future<List<Notice>> getNotices(final Session session) async {
     await _ensureAdmins(session);
-    return Notice.db.find(session, orderBy: (final t) => t.createdAt);
+    return Notice.db.find(
+      session,
+      orderBy: (final t) => t.createdAt,
+      include: Notice.include(userInfo: UserInfo.include()),
+    );
   }
 
   /// Get the contents of a sound file.
