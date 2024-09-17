@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:backstreets_widgets/screens.dart';
 import 'package:backstreets_widgets/util.dart';
+import 'package:backstreets_widgets/widgets.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
@@ -52,70 +55,93 @@ class CreateNoticeScreenState extends State<CreateNoticeScreen> {
 
   /// Build a widget.
   @override
-  Widget build(final BuildContext context) => SimpleScaffold(
-        actions: [
-          ElevatedButton(
-            onPressed: () async {
-              if (!(formKey.currentState?.validate() ?? false)) {
-                return;
-              }
-              final bytes = soundFileBytes;
-              if (bytes == null || bytes.isEmpty) {
-                return showMessage(
-                  context: context,
-                  message: 'You must choose a sound file.',
-                );
-              }
-              final notice = await client.notices.addNotice(
-                text: noticeTextController.text,
-                soundBytes: bytes,
-              );
-              if (context.mounted) {
-                Navigator.pop(context);
-              }
-              widget.onDone(notice);
-            },
-            child: const Icon(
-              Icons.save,
-              semanticLabel: 'Save',
-            ),
-          ),
-        ],
-        title: 'Create Notice',
-        body: Form(
-          key: formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                autofocus: true,
-                controller: noticeTextController,
-                decoration: const InputDecoration(
-                  label: CustomText('Notice text'),
-                ),
-                validator: FormBuilderValidators.minWordsCount(3),
-              ),
-              TextButton(
-                onPressed: () async {
-                  final result = await FilePicker.platform.pickFiles(
-                    allowedExtensions: ['.mp3', '.wav'],
-                    dialogTitle: 'Choose Sound File',
-                    type: FileType.audio,
+  Widget build(final BuildContext context) => Cancel(
+        child: SimpleScaffold(
+          actions: [
+            ElevatedButton(
+              onPressed: () async {
+                if (!(formKey.currentState?.validate() ?? false)) {
+                  return;
+                }
+                final bytes = soundFileBytes;
+                if (bytes == null || bytes.isEmpty) {
+                  return showMessage(
+                    context: context,
+                    message: 'You must choose a sound file.',
                   );
-                  if (result == null || result.files.isEmpty) {
-                    return;
+                }
+                try {
+                  final notice = await client.notices.addNotice(
+                    text: noticeTextController.text,
+                    soundBytes: bytes,
+                  );
+                  if (context.mounted) {
+                    Navigator.pop(context);
                   }
-                  final file = result.files.single;
-                  print(file);
-                  soundFileBytes = file.bytes;
-                  setState(() {});
-                },
-                child: CustomText(
-                  soundFileBytes == null
-                      ? 'Set sound file'
-                      : 'Change sound file',
-                ),
+                  widget.onDone(notice);
+                } on ErrorMessage catch (e) {
+                  if (context.mounted) {
+                    await showMessage(context: context, message: e.message);
+                  }
+                  return;
+                }
+              },
+              child: const Icon(
+                Icons.save,
+                semanticLabel: 'Save',
               ),
-            ],
+            ),
+          ],
+          title: 'Create Notice',
+          body: Form(
+            key: formKey,
+            child: Column(
+              children: [
+                TextFormField(
+                  autofocus: true,
+                  controller: noticeTextController,
+                  decoration: const InputDecoration(
+                    label: CustomText('Notice text'),
+                  ),
+                  validator: FormBuilderValidators.minWordsCount(3),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    final result = await FilePicker.platform.pickFiles(
+                      dialogTitle: 'Choose Sound File',
+                      type: FileType.audio,
+                    );
+                    if (result == null || result.files.isEmpty) {
+                      return;
+                    }
+                    final file = result.files.single;
+                    final path = file.path;
+                    final List<int> bytes;
+                    if (path != null) {
+                      bytes = File(path).readAsBytesSync();
+                    } else if (file.bytes != null) {
+                      bytes = file.bytes!;
+                    } else {
+                      if (context.mounted) {
+                        await showMessage(
+                          context: context,
+                          message: 'Could not load the file.',
+                        );
+                      }
+                      return;
+                    }
+                    setState(() {
+                      soundFileBytes = bytes;
+                    });
+                  },
+                  child: CustomText(
+                    soundFileBytes == null
+                        ? 'Set sound file'
+                        : 'Change sound file',
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );
