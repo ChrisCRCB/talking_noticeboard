@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:backstreets_widgets/screens.dart';
 import 'package:backstreets_widgets/util.dart';
@@ -90,9 +91,12 @@ class CreateNoticeScreenState extends State<CreateNoticeScreen> {
                     return;
                   }
                   final uploader = FileUploader(uploadDescription);
-                  final result = await uploader.upload(
-                    Stream.fromIterable([soundFile.bytes]),
-                    soundFile.bytes.length,
+                  final uint8List = Uint8List.fromList(soundFile.bytes);
+                  await uploader.uploadByteData(
+                    ByteData.sublistView(uint8List),
+                  );
+                  final result = await client.notices.verifyUpload(
+                    soundFile.path,
                   );
                   if (!result) {
                     if (context.mounted) {
@@ -156,7 +160,7 @@ class CreateNoticeScreenState extends State<CreateNoticeScreen> {
                     final extension = path.extension(filePath);
                     final uploadPath = '${uuid.v4()}$extension';
                     if (file.bytes == null) {
-                      bytes = File(filePath).readAsBytesSync();
+                      bytes = File(file.path!).readAsBytesSync();
                     } else {
                       bytes = file.bytes!;
                     }

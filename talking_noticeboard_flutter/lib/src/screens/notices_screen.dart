@@ -1,6 +1,7 @@
 import 'package:backstreets_widgets/extensions.dart';
 import 'package:backstreets_widgets/screens.dart';
 import 'package:backstreets_widgets/shortcuts.dart';
+import 'package:backstreets_widgets/util.dart';
 import 'package:backstreets_widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -109,7 +110,21 @@ class NoticesScreenState extends State<NoticesScreen> {
                         notice.text,
                         style: const TextStyle(fontSize: 20),
                       ),
-                      onTap: () {},
+                      onTap: () => confirm(
+                        context: context,
+                        message: 'Really delete this notice?',
+                        title: 'Delete Notice',
+                        yesCallback: () async {
+                          Navigator.pop(context);
+                          try {
+                            await client.notices.deleteNotice(notice);
+                            _notices!.remove(notice);
+                            // ignore: avoid_catches_without_on_clauses
+                          } catch (e, s) {
+                            handleError(e, s);
+                          }
+                        },
+                      ),
                     );
                   },
                   itemCount: notices.length,

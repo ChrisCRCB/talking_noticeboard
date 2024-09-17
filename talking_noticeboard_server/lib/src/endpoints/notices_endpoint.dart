@@ -80,7 +80,7 @@ class NoticesEndpoint extends Endpoint {
   /// Delete [notice].
   Future<void> deleteNotice(final Session session, final Notice notice) async {
     await session.requireScopes([deleteNotices]);
-    if (notice.id != null) {
+    if (notice.id == null) {
       throw ErrorMessage(message: 'You cannot delete $notice without an ID.');
     }
     if (await session.storage
