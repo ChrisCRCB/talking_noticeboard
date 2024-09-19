@@ -85,7 +85,9 @@ class NoticesScreenState extends State<NoticesScreen> {
       child = SimpleScaffold(
         leading: TextButton(
           onPressed: () => context.pushWidgetBuilder(
-            (final _) => const Noticeboard(),
+            (final _) => const Noticeboard(
+              canPop: true,
+            ),
           ),
           child: const CustomText('Noticeboard'),
         ),

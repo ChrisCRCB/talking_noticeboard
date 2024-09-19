@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:backstreets_widgets/screens.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_audio_games/flutter_audio_games.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:talking_noticeboard_client/talking_noticeboard_client.dart';
@@ -17,6 +18,7 @@ class Noticeboard extends StatefulWidget {
   const Noticeboard({
     this.loadInterval = const Duration(minutes: 1),
     this.skipNoticesDuration = const Duration(seconds: 5),
+    this.canPop = false,
     super.key,
   });
 
@@ -25,6 +27,9 @@ class Noticeboard extends StatefulWidget {
 
   /// How often notices can be skipped.
   final Duration skipNoticesDuration;
+
+  /// Whether the widget can be popped with the escape key.
+  final bool canPop;
 
   /// Create state for this widget.
   @override
@@ -60,6 +65,13 @@ class NoticeboardState extends State<Noticeboard> {
     super.initState();
     index = 0;
     _lastLoaded = DateTime.now();
+  }
+
+  /// Dispose of the widget.
+  @override
+  void dispose() {
+    super.dispose();
+    _soundHandle?.stop();
   }
 
   /// Build a widget.
@@ -131,6 +143,10 @@ class NoticeboardState extends State<Noticeboard> {
     return Focus(
       autofocus: true,
       onKeyEvent: (final node, final event) {
+        if (widget.canPop && event.logicalKey == LogicalKeyboardKey.escape) {
+          Navigator.pop(context);
+          return KeyEventResult.handled;
+        }
         final lastSkip = _lastSkip;
         final now = DateTime.now();
         if (lastSkip == null ||
