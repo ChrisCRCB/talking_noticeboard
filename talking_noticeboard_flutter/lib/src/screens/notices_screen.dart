@@ -13,6 +13,7 @@ import '../widgets/custom_text.dart';
 import 'account_screen.dart';
 import 'create_notice_screen.dart';
 import 'noticeboard.dart';
+import 'server_options_screen.dart';
 import 'update_user_screen.dart';
 
 /// A [ListView] which shows notices.
@@ -100,6 +101,21 @@ class NoticesScreenState extends State<NoticesScreen> {
             ),
           ),
           refreshButton,
+          IconButton(
+            onPressed: () async {
+              final serverOptions = await client.users.getServerOptions();
+              if (context.mounted) {
+                await context.pushWidgetBuilder(
+                  (final _) =>
+                      ServerOptionsScreen(serverOptions: serverOptions),
+                );
+              }
+            },
+            icon: const Icon(
+              Icons.settings,
+              semanticLabel: 'ServerOptions',
+            ),
+          ),
         ],
         title: 'Notices',
         body: RefreshIndicator(
