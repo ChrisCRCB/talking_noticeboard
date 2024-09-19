@@ -9,8 +9,10 @@ import 'package:flutter_audio_games/flutter_audio_games.dart';
 import 'package:talking_noticeboard_client/talking_noticeboard_client.dart';
 
 import '../client.dart';
+import '../widgets/custom_text.dart';
 import 'account_screen.dart';
 import 'create_notice_screen.dart';
+import 'noticeboard.dart';
 import 'update_user_screen.dart';
 
 /// A [ListView] which shows notices.
@@ -81,6 +83,12 @@ class NoticesScreenState extends State<NoticesScreen> {
       );
     } else {
       child = SimpleScaffold(
+        leading: TextButton(
+          onPressed: () => context.pushWidgetBuilder(
+            (final _) => const Noticeboard(),
+          ),
+          child: const CustomText('Noticeboard'),
+        ),
         actions: [
           IconButton(
             onPressed: updateUser,
@@ -127,10 +135,9 @@ class NoticesScreenState extends State<NoticesScreen> {
                 ),
           onRefresh: () async {
             try {
-              final result = await client.notices.getNotices();
+              await client.notices.getNotices();
               _error = null;
               _stackTrace = null;
-              setState(() => _notices = result);
               // ignore: avoid_catches_without_on_clauses
             } catch (e, s) {
               handleError(e, s);
