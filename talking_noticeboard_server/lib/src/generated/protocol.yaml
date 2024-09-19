@@ -5,7 +5,3 @@ notices:
   - deleteNotice:
   - getNotices:
   - getSoundBytes:
-users:
-  - getScopeNames:
-  - getScopes:
-  - updateScopes:

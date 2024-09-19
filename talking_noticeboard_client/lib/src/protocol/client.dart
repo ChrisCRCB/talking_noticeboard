@@ -78,45 +78,6 @@ class EndpointNotices extends _i1.EndpointRef {
       );
 }
 
-/// The endpoint for user management.
-/// {@category Endpoint}
-class EndpointUsers extends _i1.EndpointRef {
-  EndpointUsers(_i1.EndpointCaller caller) : super(caller);
-
-  @override
-  String get name => 'users';
-
-  /// Get the scopes for a user with the given [email].
-  _i2.Future<List<String>?> getScopeNames(String email) =>
-      caller.callServerEndpoint<List<String>?>(
-        'users',
-        'getScopeNames',
-        {'email': email},
-      );
-
-  /// Returns all the possible scopes for this server.
-  _i2.Future<List<String>> getScopes() =>
-      caller.callServerEndpoint<List<String>>(
-        'users',
-        'getScopes',
-        {},
-      );
-
-  /// Update {scopes} for the user with the given [email] address.
-  _i2.Future<bool> updateScopes(
-    String email,
-    List<String> scopes,
-  ) =>
-      caller.callServerEndpoint<bool>(
-        'users',
-        'updateScopes',
-        {
-          'email': email,
-          'scopes': scopes,
-        },
-      );
-}
-
 class _Modules {
   _Modules(Client client) {
     auth = _i5.Caller(client);
@@ -152,21 +113,15 @@ class Client extends _i1.ServerpodClientShared {
               disconnectStreamsOnLostInternetConnection,
         ) {
     notices = EndpointNotices(this);
-    users = EndpointUsers(this);
     modules = _Modules(this);
   }
 
   late final EndpointNotices notices;
 
-  late final EndpointUsers users;
-
   late final _Modules modules;
 
   @override
-  Map<String, _i1.EndpointRef> get endpointRefLookup => {
-        'notices': notices,
-        'users': users,
-      };
+  Map<String, _i1.EndpointRef> get endpointRefLookup => {'notices': notices};
 
   @override
   Map<String, _i1.ModuleEndpointCaller> get moduleLookup =>

@@ -3,6 +3,7 @@ import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 
 import '../constants.dart';
 import '../extensions.dart';
+import '../generated/protocol.dart';
 
 /// The endpoint for user management.
 class UsersEndpoint extends Endpoint {
@@ -24,7 +25,7 @@ class UsersEndpoint extends Endpoint {
   Future<List<String>> getScopes(final Session session) async {
     final adminScope = Scope.admin.name!;
     await session.requireScopes([adminScope]);
-    return [adminScope, addNotices, deleteNotices];
+    return [adminScope, addNotices, deleteNotices, editServerOptions];
   }
 
   /// Update {scopes} for the user with the given [email] address.
@@ -44,5 +45,18 @@ class UsersEndpoint extends Endpoint {
       scopes.map(Scope.new).toSet(),
     );
     return true;
+  }
+
+  /// Get the server options.
+  Future<ServerOptions> getServerOptions(final Session session) async =>
+      session.serverOptions;
+
+  /// Update server options.
+  Future<void> updateServerOptions(
+    final Session session,
+    final ServerOptions serverOptions,
+  ) async {
+    await session.requireScopes([editServerOptions]);
+    serverOptions.save();
   }
 }

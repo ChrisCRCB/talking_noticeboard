@@ -1,7 +1,13 @@
+import 'dart:convert';
+
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 
+import 'constants.dart';
 import 'generated/protocol.dart';
+
+/// The JSON encoder to use.
+const indentedJsonEncoder = JsonEncoder.withIndent('  ');
 
 /// Useful extension methods.
 extension SessionX on Session {
@@ -35,5 +41,24 @@ extension SessionX on Session {
       }
     }
     return userInfo;
+  }
+
+  /// Get server options.
+  ServerOptions get serverOptions {
+    if (serverOptionsFile.existsSync()) {
+      return ServerOptions.fromJson(
+        jsonDecode(serverOptionsFile.readAsStringSync()),
+      );
+    }
+    final options = ServerOptions()..save();
+    return options;
+  }
+}
+
+/// Useful extension methods.
+extension ServerOptionsX on ServerOptions {
+  /// Save the options.
+  void save() {
+    serverOptionsFile.writeAsStringSync(indentedJsonEncoder.convert(this));
   }
 }
