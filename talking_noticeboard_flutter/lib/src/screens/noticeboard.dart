@@ -153,26 +153,34 @@ class NoticeboardState extends State<Noticeboard> {
         ),
       );
     }
-    return Focus(
-      autofocus: true,
-      onKeyEvent: (final node, final event) {
-        if (widget.canPop && event.logicalKey == LogicalKeyboardKey.escape) {
-          Navigator.pop(context);
+    return GestureDetector(
+      onTap: () => switchNotices(serverOptions),
+      child: Focus(
+        autofocus: true,
+        onKeyEvent: (final node, final event) {
+          if (widget.canPop && event.logicalKey == LogicalKeyboardKey.escape) {
+            Navigator.pop(context);
+            return KeyEventResult.handled;
+          }
+          switchNotices(serverOptions);
           return KeyEventResult.handled;
-        }
-        final lastSkip = _lastSkip;
-        final now = DateTime.now();
-        if (lastSkip == null ||
-            now.difference(lastSkip) > serverOptions.skipInterval) {
-          setState(() {
-            _lastSkip = now;
-            index++;
-          });
-        }
-        return KeyEventResult.handled;
-      },
-      child: child,
+        },
+        child: child,
+      ),
     );
+  }
+
+  /// Switch to the next notice.
+  void switchNotices(final ServerOptions serverOptions) {
+    final lastSkip = _lastSkip;
+    final now = DateTime.now();
+    if (lastSkip == null ||
+        now.difference(lastSkip) > serverOptions.skipInterval) {
+      setState(() {
+        _lastSkip = now;
+        index++;
+      });
+    }
   }
 
   /// Reset the times to now.
