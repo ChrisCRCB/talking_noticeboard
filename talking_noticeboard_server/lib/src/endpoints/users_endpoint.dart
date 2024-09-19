@@ -7,10 +7,6 @@ import '../generated/protocol.dart';
 
 /// The endpoint for user management.
 class UsersEndpoint extends Endpoint {
-  /// Require login.
-  @override
-  bool get requireLogin => true;
-
   /// Get the scopes for a user with the given [email].
   Future<List<String>?> getScopeNames(
     final Session session,
