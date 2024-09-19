@@ -18,6 +18,7 @@ class Noticeboard extends StatefulWidget {
   const Noticeboard({
     this.loadInterval = const Duration(minutes: 1),
     this.skipNoticesDuration = const Duration(seconds: 5),
+    this.playLocationInterval = const Duration(minutes: 1),
     this.canPop = false,
     super.key,
   });
@@ -27,6 +28,9 @@ class Noticeboard extends StatefulWidget {
 
   /// How often notices can be skipped.
   final Duration skipNoticesDuration;
+
+  /// How often the location sound should play.
+  final Duration playLocationInterval;
 
   /// Whether the widget can be popped with the escape key.
   final bool canPop;
@@ -53,11 +57,14 @@ class NoticeboardState extends State<Noticeboard> {
   /// The index of the current notice.
   late int index;
 
-  /// The currently playing sound.
-  SoundHandle? _soundHandle;
+  /// The currently playing notice sound.
+  SoundHandle? _noticeSoundHandle;
 
   /// The last time notices were skipped.
   DateTime? _lastSkip;
+
+  /// The location timer.
+  late Timer locationTimer;
 
   /// Initialise state.
   @override
@@ -65,13 +72,28 @@ class NoticeboardState extends State<Noticeboard> {
     super.initState();
     index = 0;
     _lastLoaded = DateTime.now();
+    locationTimer = Timer.periodic(
+      widget.playLocationInterval,
+      (final timer) => playLocationSound(),
+    );
+  }
+
+  /// Play the location ping.
+  void playLocationSound() {
+    if (context.mounted) {
+      context.playSound(
+        Assets.sounds.location
+            .asSound(destroy: true, soundType: SoundType.asset),
+      );
+    }
   }
 
   /// Dispose of the widget.
   @override
   void dispose() {
     super.dispose();
-    _soundHandle?.stop();
+    _noticeSoundHandle?.stop();
+    locationTimer.cancel();
   }
 
   /// Build a widget.
@@ -119,8 +141,8 @@ class NoticeboardState extends State<Noticeboard> {
         index = 0;
       }
       final notice = notices[index];
-      _soundHandle?.stop();
-      _soundHandle = null;
+      _noticeSoundHandle?.stop();
+      _noticeSoundHandle = null;
       context
           .playSound(
         Sound(
@@ -133,7 +155,7 @@ class NoticeboardState extends State<Noticeboard> {
         _error = null;
         _stackTrace = null;
         resetTimes();
-        _soundHandle = soundHandle;
+        _noticeSoundHandle = soundHandle;
         return soundHandle;
       }).onError(handleError);
       child = Material(
