@@ -16,20 +16,12 @@ class Noticeboard extends StatefulWidget {
   /// Create an instance.
   const Noticeboard({
     this.loadInterval = const Duration(minutes: 1),
-    this.skipNoticesDuration = const Duration(seconds: 5),
-    this.playLocationInterval = const Duration(minutes: 1),
     this.canPop = false,
     super.key,
   });
 
   /// How often notices should be reloaded.
   final Duration loadInterval;
-
-  /// How often notices can be skipped.
-  final Duration skipNoticesDuration;
-
-  /// How often the location sound should play.
-  final Duration playLocationInterval;
 
   /// Whether the widget can be popped with the escape key.
   final bool canPop;
@@ -63,7 +55,10 @@ class NoticeboardState extends State<Noticeboard> {
   DateTime? _lastSkip;
 
   /// The location timer.
-  late Timer locationTimer;
+  Timer? _locationTimer;
+
+  /// The server options to work with.
+  ServerOptions? _serverOptions;
 
   /// Initialise state.
   @override
@@ -71,10 +66,6 @@ class NoticeboardState extends State<Noticeboard> {
     super.initState();
     index = 0;
     _lastLoaded = DateTime.now();
-    locationTimer = Timer.periodic(
-      widget.playLocationInterval,
-      (final timer) => playLocationSound(),
-    );
   }
 
   /// Play the location ping.
@@ -92,7 +83,7 @@ class NoticeboardState extends State<Noticeboard> {
   void dispose() {
     super.dispose();
     _noticeSoundHandle?.stop();
-    locationTimer.cancel();
+    _locationTimer?.cancel();
   }
 
   /// Build a widget.
@@ -113,27 +104,25 @@ class NoticeboardState extends State<Noticeboard> {
         stackTrace: _stackTrace,
       );
     }
+    final serverOptions = _serverOptions;
+    if (serverOptions == null) {
+      reloadServerOptions();
+      return const LoadingScreen();
+    }
     final notices = _notices;
     if (notices == null ||
         DateTime.now().difference(_lastLoaded) > widget.loadInterval) {
-      client.notices
-          .getNotices()
-          .then(
-            (final value) => setState(() {
-              _error = null;
-              _stackTrace = null;
-              resetTimes();
-              _notices = value;
-            }),
-          )
-          .onError(handleError);
+      reloadNotices();
       return const LoadingScreen();
     }
     final Widget child;
     if (notices.isEmpty) {
       _notices = null;
-      child = const Material(
-        child: NoticeText(text: 'There are no notices to show.'),
+      child = Material(
+        child: NoticeText(
+          text: 'There are no notices to show.',
+          serverOptions: serverOptions,
+        ),
       );
     } else {
       if (index >= notices.length) {
@@ -160,6 +149,7 @@ class NoticeboardState extends State<Noticeboard> {
       child = Material(
         child: NoticeText(
           text: notice.text,
+          serverOptions: serverOptions,
         ),
       );
     }
@@ -173,7 +163,7 @@ class NoticeboardState extends State<Noticeboard> {
         final lastSkip = _lastSkip;
         final now = DateTime.now();
         if (lastSkip == null ||
-            now.difference(lastSkip) > widget.skipNoticesDuration) {
+            now.difference(lastSkip) > serverOptions.skipInterval) {
           setState(() {
             _lastSkip = now;
             index++;
@@ -209,5 +199,36 @@ class NoticeboardState extends State<Noticeboard> {
       );
     }
     throw StateError('The context is no longer mounted.');
+  }
+
+  /// Reload both server options, and the notices.
+  Future<void> reloadNotices() async {
+    try {
+      await reloadServerOptions();
+      _notices = await client.notices.getNotices();
+      _error = null;
+      _stackTrace = null;
+      resetTimes();
+      // ignore: avoid_catches_without_on_clauses
+    } catch (e, s) {
+      await handleError(e, s);
+    }
+  }
+
+  /// Reload the server options.
+  Future<void> reloadServerOptions() async {
+    try {
+      final serverOptions = await client.users.getServerOptions();
+      _serverOptions = serverOptions;
+      _locationTimer?.cancel();
+      _locationTimer = Timer.periodic(
+        serverOptions.playLocationInterval,
+        (final _) => playLocationSound(),
+      );
+      setState(() {});
+      // ignore: avoid_catches_without_on_clauses
+    } catch (e, s) {
+      await handleError(e, s);
+    }
   }
 }
