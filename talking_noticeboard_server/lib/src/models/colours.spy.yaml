@@ -1,0 +1,37 @@
+### Possible colours.
+enum: Colours
+values:
+  ### Completely opaque black.
+  - black
+  ### Black with 12% opacity.
+  - black12
+  ### Black with 26% opacity.
+  - black26
+  ### Black with 38% opacity.
+  - black38
+  ### Black with 45% opacity.
+  - black45
+  ### Black with 54% opacity.
+  - black54
+  ### Black with 87% opacity.
+  - black87
+  ### Completely invisible.
+  - transparent
+  ### Completely opaque white.
+  - white
+  ### White with 10% opacity.
+  - white10
+  ### White with 12% opacity.
+  - white12
+  ### White with 24% opacity.
+  - white24
+  ### White with 30% opacity.
+  - white30
+  ### White with 38% opacity.
+  - white38
+  ### White with 54% opacity.
+  - white54
+  ### White with 60% opacity.
+  - white60
+  ### White with 70% opacity.
+  - white70

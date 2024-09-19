@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:backstreets_widgets/screens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,7 +9,7 @@ import 'package:talking_noticeboard_client/talking_noticeboard_client.dart';
 
 import '../../gen/assets.gen.dart';
 import '../client.dart';
-import '../widgets/custom_text.dart';
+import '../widgets/notice_text.dart';
 
 /// A [ListView] which shows notices.
 class Noticeboard extends StatefulWidget {
@@ -134,7 +133,7 @@ class NoticeboardState extends State<Noticeboard> {
     if (notices.isEmpty) {
       _notices = null;
       child = const Material(
-        child: CustomText('There are no notices to show.'),
+        child: NoticeText(text: 'There are no notices to show.'),
       );
     } else {
       if (index >= notices.length) {
@@ -159,7 +158,9 @@ class NoticeboardState extends State<Noticeboard> {
         return soundHandle;
       }).onError(handleError);
       child = Material(
-        child: AutoSizeText(notice.text),
+        child: NoticeText(
+          text: notice.text,
+        ),
       );
     }
     return Focus(

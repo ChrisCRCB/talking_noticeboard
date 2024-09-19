@@ -1,0 +1,13 @@
+### Options for the server.
+class: ServerOptions
+fields:
+  ### The size of the font.
+  fontSize: int, default=48
+  ### The background colour.
+  backgroundColour: Colours, default=black
+  ### The text colour.
+  textColour: Colours, default=white
+  ### How often notices can be skipped.
+  skipInterval: Duration, default=5s
+  ### How often the location sound plays.
+  playLocationInterval: Duration, default=10min
