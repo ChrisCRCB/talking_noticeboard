@@ -89,7 +89,7 @@ class NoticeboardState extends State<Noticeboard> {
             (final value) => setState(() {
               _error = null;
               _stackTrace = null;
-              _lastLoaded = DateTime.now();
+              resetTimes();
               _notices = value;
             }),
           )
@@ -111,14 +111,19 @@ class NoticeboardState extends State<Noticeboard> {
       _soundHandle = null;
       context
           .playSound(
-            Sound(
-              path: notice.path,
-              soundType: SoundType.custom,
-              destroy: false,
-            ),
-          )
-          .then((final soundHandle) => _soundHandle = soundHandle)
-          .onError(handleError);
+        Sound(
+          path: notice.path,
+          soundType: SoundType.custom,
+          destroy: false,
+        ),
+      )
+          .then((final soundHandle) {
+        _error = null;
+        _stackTrace = null;
+        resetTimes();
+        _soundHandle = soundHandle;
+        return soundHandle;
+      }).onError(handleError);
       child = Material(
         child: AutoSizeText(notice.text),
       );
@@ -139,6 +144,12 @@ class NoticeboardState extends State<Noticeboard> {
       },
       child: child,
     );
+  }
+
+  /// Reset the times to now.
+  void resetTimes() {
+    _lastLoaded = DateTime.now();
+    _lastSkip = _lastLoaded;
   }
 
   /// Handle an error.
