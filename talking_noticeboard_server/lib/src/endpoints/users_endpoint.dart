@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:path/path.dart' as path;
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 
@@ -54,5 +57,22 @@ class UsersEndpoint extends Endpoint {
   ) async {
     await session.requireScopes([editServerOptions]);
     serverOptions.save();
+  }
+
+  /// Get the location sound.
+  Future<List<int>> getLocationSound(final Session session) async {
+    if (!soundsDirectory.existsSync()) {
+      soundsDirectory.createSync(recursive: true);
+    }
+    final file = File(
+      path.join(
+        soundsDirectory.path,
+        session.serverOptions.locationSoundFilename,
+      ),
+    );
+    if (file.existsSync()) {
+      return file.readAsBytesSync();
+    }
+    throw ErrorMessage(message: 'File ${file.path} not found.');
   }
 }

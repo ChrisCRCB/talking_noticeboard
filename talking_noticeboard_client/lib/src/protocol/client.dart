@@ -133,6 +133,14 @@ class EndpointUsers extends _i1.EndpointRef {
         'updateServerOptions',
         {'serverOptions': serverOptions},
       );
+
+  /// Get the location sound.
+  _i2.Future<List<int>> getLocationSound() =>
+      caller.callServerEndpoint<List<int>>(
+        'users',
+        'getLocationSound',
+        {},
+      );
 }
 
 class _Modules {

@@ -20,6 +20,7 @@ abstract class ServerOptions implements _i1.SerializableModel {
     _i2.Colours? textColour,
     Duration? skipInterval,
     Duration? playLocationInterval,
+    String? locationSoundFilename,
   })  : fontSize = fontSize ?? 48,
         backgroundColour = backgroundColour ?? _i2.Colours.black,
         textColour = textColour ?? _i2.Colours.white,
@@ -38,7 +39,8 @@ abstract class ServerOptions implements _i1.SerializableModel {
               minutes: 10,
               seconds: 0,
               milliseconds: 0,
-            );
+            ),
+        locationSoundFilename = locationSoundFilename ?? 'location.wav';
 
   factory ServerOptions({
     int? fontSize,
@@ -46,6 +48,7 @@ abstract class ServerOptions implements _i1.SerializableModel {
     _i2.Colours? textColour,
     Duration? skipInterval,
     Duration? playLocationInterval,
+    String? locationSoundFilename,
   }) = _ServerOptionsImpl;
 
   factory ServerOptions.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -59,6 +62,8 @@ abstract class ServerOptions implements _i1.SerializableModel {
           _i1.DurationJsonExtension.fromJson(jsonSerialization['skipInterval']),
       playLocationInterval: _i1.DurationJsonExtension.fromJson(
           jsonSerialization['playLocationInterval']),
+      locationSoundFilename:
+          jsonSerialization['locationSoundFilename'] as String,
     );
   }
 
@@ -77,12 +82,16 @@ abstract class ServerOptions implements _i1.SerializableModel {
   /// How often the location sound plays.
   Duration playLocationInterval;
 
+  /// The file where the location sound is stored.
+  String locationSoundFilename;
+
   ServerOptions copyWith({
     int? fontSize,
     _i2.Colours? backgroundColour,
     _i2.Colours? textColour,
     Duration? skipInterval,
     Duration? playLocationInterval,
+    String? locationSoundFilename,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -92,6 +101,7 @@ abstract class ServerOptions implements _i1.SerializableModel {
       'textColour': textColour.toJson(),
       'skipInterval': skipInterval.toJson(),
       'playLocationInterval': playLocationInterval.toJson(),
+      'locationSoundFilename': locationSoundFilename,
     };
   }
 
@@ -108,12 +118,14 @@ class _ServerOptionsImpl extends ServerOptions {
     _i2.Colours? textColour,
     Duration? skipInterval,
     Duration? playLocationInterval,
+    String? locationSoundFilename,
   }) : super._(
           fontSize: fontSize,
           backgroundColour: backgroundColour,
           textColour: textColour,
           skipInterval: skipInterval,
           playLocationInterval: playLocationInterval,
+          locationSoundFilename: locationSoundFilename,
         );
 
   @override
@@ -123,6 +135,7 @@ class _ServerOptionsImpl extends ServerOptions {
     _i2.Colours? textColour,
     Duration? skipInterval,
     Duration? playLocationInterval,
+    String? locationSoundFilename,
   }) {
     return ServerOptions(
       fontSize: fontSize ?? this.fontSize,
@@ -130,6 +143,8 @@ class _ServerOptionsImpl extends ServerOptions {
       textColour: textColour ?? this.textColour,
       skipInterval: skipInterval ?? this.skipInterval,
       playLocationInterval: playLocationInterval ?? this.playLocationInterval,
+      locationSoundFilename:
+          locationSoundFilename ?? this.locationSoundFilename,
     );
   }
 }

@@ -11,3 +11,4 @@ users:
   - updateScopes:
   - getServerOptions:
   - updateServerOptions:
+  - getLocationSound:

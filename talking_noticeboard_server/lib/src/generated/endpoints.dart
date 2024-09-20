@@ -229,6 +229,16 @@ class Endpoints extends _i1.EndpointDispatch {
             params['serverOptions'],
           ),
         ),
+        'getLocationSound': _i1.MethodConnector(
+          name: 'getLocationSound',
+          params: {},
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['users'] as _i3.UsersEndpoint)
+                  .getLocationSound(session),
+        ),
       },
     );
     modules['serverpod_auth'] = _i6.Endpoints()..initializeEndpoints(server);
