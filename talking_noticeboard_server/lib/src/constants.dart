@@ -9,6 +9,9 @@ const String deleteNotices = 'delete-notice';
 /// Scope for editing server options.
 const editServerOptions = 'edit-server-options';
 
+/// The name of the scope which allows downloading notices and sounds.
+const downloadNotices = 'download-notices';
+
 /// The storage key for notice sound files.
 const noticeStorageId = 'public';
 

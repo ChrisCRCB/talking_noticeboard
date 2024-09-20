@@ -24,7 +24,13 @@ class UsersEndpoint extends Endpoint {
   Future<List<String>> getScopes(final Session session) async {
     final adminScope = Scope.admin.name!;
     await session.requireScopes([adminScope]);
-    return [adminScope, addNotices, deleteNotices, editServerOptions];
+    return [
+      downloadNotices,
+      adminScope,
+      addNotices,
+      deleteNotices,
+      editServerOptions,
+    ];
   }
 
   /// Update {scopes} for the user with the given [email] address.

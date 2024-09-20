@@ -96,6 +96,7 @@ class NoticesEndpoint extends Endpoint {
   /// List all notices.
   Future<List<Notice>> getNotices(final Session session) async {
     await _ensureAdmins(session);
+    await _requireCanListNotices(session);
     return Notice.db.find(
       session,
       orderBy: (final t) => t.createdAt,
@@ -103,11 +104,21 @@ class NoticesEndpoint extends Endpoint {
     );
   }
 
+  /// Ensure the authenticated user can either download notices, or is an admin.
+  Future<UserInfo> _requireCanListNotices(final Session session) async {
+    try {
+      return session.requireScopes([downloadNotices]);
+    } on ErrorMessage {
+      return session.requireScopes([Scope.admin.name!]);
+    }
+  }
+
   /// Get the contents of a sound file.
   Future<ByteData> getSoundBytes(
     final Session session,
     final String path,
   ) async {
+    await _requireCanListNotices(session);
     if (await session.storage
         .fileExists(storageId: noticeStorageId, path: path)) {
       final bytes = await session.storage.retrieveFile(
