@@ -13,11 +13,8 @@ class $SoundsGen {
   /// File path: sounds/error.wav
   String get error => 'sounds/error.wav';
 
-  /// File path: sounds/location.wav
-  String get location => 'sounds/location.wav';
-
   /// List of all assets
-  List<String> get values => [error, location];
+  List<String> get values => [error];
 }
 
 class Assets {

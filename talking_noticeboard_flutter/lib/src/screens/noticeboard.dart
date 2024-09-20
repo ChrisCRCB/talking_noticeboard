@@ -1,10 +1,14 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:backstreets_widgets/screens.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_audio_games/flutter_audio_games.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'package:talking_noticeboard_client/talking_noticeboard_client.dart';
 
 import '../../gen/assets.gen.dart';
@@ -57,6 +61,9 @@ class NoticeboardState extends State<Noticeboard> {
   /// The location timer.
   Timer? _locationTimer;
 
+  /// The location sound handle.
+  SoundHandle? _locationSoundHandle;
+
   /// The server options to work with.
   ServerOptions? _serverOptions;
 
@@ -69,12 +76,42 @@ class NoticeboardState extends State<Noticeboard> {
   }
 
   /// Play the location ping.
-  void playLocationSound() {
-    if (context.mounted) {
-      context.playSound(
-        Assets.sounds.location
-            .asSound(destroy: true, soundType: SoundType.asset),
+  Future<void> playLocationSound() async {
+    final data = await client.users.getLocationSound();
+    final SoundHandle soundHandle;
+    await _locationSoundHandle?.stop();
+    if (kIsWeb) {
+      final soLoud = SoLoud.instance;
+      final audioSource = await soLoud.loadMem(
+        'location.wav',
+        Uint8List.fromList(data),
       );
+      soundHandle = await soLoud.play(audioSource)
+        ..scheduleStop(audioSource.length);
+    } else {
+      final documentsDirectory = await getApplicationDocumentsDirectory();
+      final appDocumentsDirectory = Directory(
+        path.join(documentsDirectory.path, 'talking_noticeboard'),
+      );
+      if (!appDocumentsDirectory.existsSync()) {
+        appDocumentsDirectory.createSync(recursive: true);
+      }
+      final file = File(path.join(appDocumentsDirectory.path, 'location.wav'))
+        ..writeAsBytesSync(data);
+      if (!mounted) {
+        return;
+      }
+      soundHandle = await context.playSound(
+        file.path.asSound(
+          destroy: false,
+          soundType: SoundType.file,
+        ),
+      );
+    }
+    if (context.mounted) {
+      _locationSoundHandle = soundHandle;
+    } else {
+      await soundHandle.stop();
     }
   }
 
@@ -84,6 +121,8 @@ class NoticeboardState extends State<Noticeboard> {
     super.dispose();
     _noticeSoundHandle?.stop();
     _locationTimer?.cancel();
+    _locationSoundHandle?.stop();
+    _locationSoundHandle = null;
   }
 
   /// Build a widget.

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_audio_games/flutter_audio_games.dart';
@@ -25,6 +26,13 @@ class MyApp extends StatelessWidget {
     RendererBinding.instance.ensureSemantics();
     return SoLoudScope(
       loadCustomSound: (final sourceLoader, final sound) async {
+        if (kIsWeb || kIsWasm) {
+          final bytes = await client.notices.getSoundBytes(sound.path);
+          return sourceLoader.soLoud.loadMem(
+            sound.path,
+            bytes.buffer.asUint8List(),
+          );
+        }
         final documentsDirectory = await getApplicationDocumentsDirectory();
         final appDocumentsDirectory = Directory(
           path.join(documentsDirectory.path, 'talking_noticeboard'),

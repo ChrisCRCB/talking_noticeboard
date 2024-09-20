@@ -3,7 +3,9 @@ import 'dart:math';
 
 import 'package:backstreets_widgets/screens.dart';
 import 'package:backstreets_widgets/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_soloud/flutter_soloud.dart';
 
 import '../client.dart';
 import '../widgets/custom_text.dart';
@@ -46,6 +48,9 @@ class HomePageState extends State<HomePage> {
   /// A stack trace to show.
   StackTrace? _stackTrace;
 
+  /// Whether SoLoud has been initialised yet.
+  late bool soLoudInitialised;
+
   /// The page to show.
   late PageToShow page;
 
@@ -62,6 +67,7 @@ class HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    soLoudInitialised = false;
     _sessionManagerInitialised = false;
     page = PageToShow.unset;
     _remainingSeconds = widget.initialSeconds;
@@ -95,6 +101,7 @@ class HomePageState extends State<HomePage> {
   void dispose() {
     super.dispose();
     timer.cancel();
+    SoLoud.instance.deinit();
   }
 
   /// Build a widget.
@@ -109,6 +116,28 @@ class HomePageState extends State<HomePage> {
           stackTrace: _stackTrace,
         ),
       );
+    }
+    if (!soLoudInitialised) {
+      if (kIsWeb) {
+        return SimpleScaffold(
+          title: 'Enable Audio',
+          body: Center(
+            child: TextButton(
+              onPressed: () async {
+                await SoLoud.instance.init();
+                setState(() {});
+              },
+              autofocus: true,
+              child: const CustomText('CLICK ME!'),
+            ),
+          ),
+        );
+      } else {
+        SoLoud.instance.init().then((final _) {
+          setState(() => soLoudInitialised = true);
+        }).onError(handleError);
+        return const LoadingScreen();
+      }
     }
     if (!_sessionManagerInitialised) {
       sessionManager
@@ -150,7 +179,7 @@ class HomePageState extends State<HomePage> {
   }
 
   /// Handle an [error].
-  void handleError(final Object error, final StackTrace stackTrace) {
+  FutureOr<Null> handleError(final Object error, final StackTrace stackTrace) {
     _remainingSeconds = widget.initialSeconds;
     setState(() {
       page = PageToShow.unset;
