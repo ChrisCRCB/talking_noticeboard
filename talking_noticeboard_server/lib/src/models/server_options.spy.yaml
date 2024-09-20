@@ -11,3 +11,5 @@ fields:
   skipInterval: Duration, default=5s
   ### How often the location sound plays.
   playLocationInterval: Duration, default=10min
+  ### The file where the error sound is stored.
+  errorSoundFilename: String, default='error.wav'

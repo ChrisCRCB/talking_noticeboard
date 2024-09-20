@@ -14,3 +14,6 @@ const noticeStorageId = 'public';
 
 /// The file where server options reside.
 final serverOptionsFile = File('config/server_options.json');
+
+/// The directory where sound files are stored.
+final soundsDirectory = Directory('sounds');
