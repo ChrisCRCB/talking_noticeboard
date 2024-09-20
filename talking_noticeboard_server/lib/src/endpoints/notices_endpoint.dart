@@ -106,11 +106,12 @@ class NoticesEndpoint extends Endpoint {
 
   /// Ensure the authenticated user can either download notices, or is an admin.
   Future<UserInfo> _requireCanListNotices(final Session session) async {
-    try {
-      return session.requireScopes([Scope.admin.name!]);
-    } on ErrorMessage {
-      return session.requireScopes([downloadNotices]);
+    final userInfo = await session.requireUser;
+    if (userInfo.scopeNames.contains(Scope.admin.name) ||
+        userInfo.scopeNames.contains(downloadNotices)) {
+      return userInfo;
     }
+    throw ErrorMessage(message: 'You do not have sufficient permissions.');
   }
 
   /// Get the contents of a sound file.
