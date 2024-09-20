@@ -107,9 +107,9 @@ class NoticesEndpoint extends Endpoint {
   /// Ensure the authenticated user can either download notices, or is an admin.
   Future<UserInfo> _requireCanListNotices(final Session session) async {
     try {
-      return session.requireScopes([downloadNotices]);
-    } on ErrorMessage {
       return session.requireScopes([Scope.admin.name!]);
+    } on ErrorMessage {
+      return session.requireScopes([downloadNotices]);
     }
   }
 
