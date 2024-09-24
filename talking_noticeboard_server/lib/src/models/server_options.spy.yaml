@@ -2,7 +2,7 @@
 class: ServerOptions
 fields:
   ### The size of the font.
-  fontSize: int, default=48
+  fontSize: int, default=200
   ### The background colour.
   backgroundColour: Colours, default=black
   ### The text colour.

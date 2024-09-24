@@ -21,7 +21,7 @@ abstract class ServerOptions implements _i1.SerializableModel {
     Duration? skipInterval,
     Duration? playLocationInterval,
     String? locationSoundFilename,
-  })  : fontSize = fontSize ?? 48,
+  })  : fontSize = fontSize ?? 200,
         backgroundColour = backgroundColour ?? _i2.Colours.black,
         textColour = textColour ?? _i2.Colours.white,
         skipInterval = skipInterval ??
