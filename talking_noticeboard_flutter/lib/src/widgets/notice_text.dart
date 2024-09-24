@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:talking_noticeboard_client/talking_noticeboard_client.dart';
 
@@ -20,12 +21,14 @@ class NoticeText extends StatelessWidget {
 
   /// Build the widget.
   @override
-  Widget build(final BuildContext context) => Text(
-        text,
-        style: TextStyle(
-          fontSize: serverOptions.fontSize.toDouble(),
-          color: serverOptions.textColour.color,
-          backgroundColor: serverOptions.backgroundColour.color,
+  Widget build(final BuildContext context) => Center(
+        child: AutoSizeText(
+          text,
+          style: TextStyle(
+            fontSize: serverOptions.fontSize.toDouble(),
+            color: serverOptions.textColour.color,
+            backgroundColor: serverOptions.backgroundColour.color,
+          ),
         ),
       );
 }
