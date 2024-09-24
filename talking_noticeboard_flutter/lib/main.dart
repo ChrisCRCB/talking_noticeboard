@@ -8,6 +8,7 @@ import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
+import 'gen/assets.gen.dart';
 import 'src/client.dart';
 import 'src/screens/home_page.dart';
 
@@ -26,32 +27,44 @@ class MyApp extends StatelessWidget {
     RendererBinding.instance.ensureSemantics();
     return SoLoudScope(
       loadCustomSound: (final sourceLoader, final sound) async {
-        if (kIsWeb || kIsWasm) {
-          final bytes = await client.notices.getSoundBytes(sound.path);
-          return sourceLoader.soLoud.loadMem(
-            sound.path,
-            bytes.buffer.asUint8List(),
+        try {
+          if (kIsWeb || kIsWasm) {
+            final bytes = await client.notices.getSoundBytes(sound.path);
+            return sourceLoader.soLoud.loadMem(
+              sound.path,
+              bytes.buffer.asUint8List(),
+            );
+          }
+          final documentsDirectory = await getApplicationDocumentsDirectory();
+          final appDocumentsDirectory = Directory(
+            path.join(documentsDirectory.path, 'talking_noticeboard'),
+          );
+          if (!appDocumentsDirectory.existsSync()) {
+            appDocumentsDirectory.createSync(recursive: true);
+          }
+          final file = File(path.join(appDocumentsDirectory.path, sound.path));
+          if (!file.existsSync()) {
+            final bytes = await client.notices.getSoundBytes(sound.path);
+            file.writeAsBytesSync(bytes.buffer.asUint8List());
+          }
+          return sourceLoader.loadSound(
+            sound.copyWith(
+              soundType: SoundType.file,
+              path: file.path,
+              loadMode: LoadMode.disk,
+            ),
+          );
+          // ignore: avoid_catches_without_on_clauses
+        } catch (e, s) {
+          // ignore: avoid_print
+          print('Error: $e\n$s');
+          return sourceLoader.loadSound(
+            sound.copyWith(
+              path: Assets.sounds.error,
+              soundType: SoundType.asset,
+            ),
           );
         }
-        final documentsDirectory = await getApplicationDocumentsDirectory();
-        final appDocumentsDirectory = Directory(
-          path.join(documentsDirectory.path, 'talking_noticeboard'),
-        );
-        if (!appDocumentsDirectory.existsSync()) {
-          appDocumentsDirectory.createSync(recursive: true);
-        }
-        final file = File(path.join(appDocumentsDirectory.path, sound.path));
-        if (!file.existsSync()) {
-          final bytes = await client.notices.getSoundBytes(sound.path);
-          file.writeAsBytesSync(bytes.buffer.asUint8List());
-        }
-        return sourceLoader.loadSound(
-          sound.copyWith(
-            soundType: SoundType.file,
-            path: file.path,
-            loadMode: LoadMode.disk,
-          ),
-        );
       },
       child: MaterialApp(
         title: 'Talking Noticeboard',
