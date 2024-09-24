@@ -70,6 +70,8 @@ class MyApp extends StatelessWidget {
         title: 'Talking Noticeboard',
         theme: ThemeData(
           primarySwatch: Colors.blue,
+          brightness: Brightness.dark,
+          scaffoldBackgroundColor: Colors.black,
         ),
         home: const HomePage(),
       ),
