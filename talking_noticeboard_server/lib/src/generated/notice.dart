@@ -278,7 +278,7 @@ class NoticeRepository {
   final attachRow = const NoticeAttachRowRepository._();
 
   Future<List<Notice>> find(
-    _i1.Session session, {
+    _i1.DatabaseAccessor databaseAccessor, {
     _i1.WhereExpressionBuilder<NoticeTable>? where,
     int? limit,
     int? offset,
@@ -288,20 +288,20 @@ class NoticeRepository {
     _i1.Transaction? transaction,
     NoticeInclude? include,
   }) async {
-    return session.db.find<Notice>(
+    return databaseAccessor.db.find<Notice>(
       where: where?.call(Notice.t),
       orderBy: orderBy?.call(Notice.t),
       orderByList: orderByList?.call(Notice.t),
       orderDescending: orderDescending,
       limit: limit,
       offset: offset,
-      transaction: transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
       include: include,
     );
   }
 
   Future<Notice?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseAccessor databaseAccessor, {
     _i1.WhereExpressionBuilder<NoticeTable>? where,
     int? offset,
     _i1.OrderByBuilder<NoticeTable>? orderBy,
@@ -310,121 +310,121 @@ class NoticeRepository {
     _i1.Transaction? transaction,
     NoticeInclude? include,
   }) async {
-    return session.db.findFirstRow<Notice>(
+    return databaseAccessor.db.findFirstRow<Notice>(
       where: where?.call(Notice.t),
       orderBy: orderBy?.call(Notice.t),
       orderByList: orderByList?.call(Notice.t),
       orderDescending: orderDescending,
       offset: offset,
-      transaction: transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
       include: include,
     );
   }
 
   Future<Notice?> findById(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     int id, {
     _i1.Transaction? transaction,
     NoticeInclude? include,
   }) async {
-    return session.db.findById<Notice>(
+    return databaseAccessor.db.findById<Notice>(
       id,
-      transaction: transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
       include: include,
     );
   }
 
   Future<List<Notice>> insert(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     List<Notice> rows, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.insert<Notice>(
+    return databaseAccessor.db.insert<Notice>(
       rows,
-      transaction: transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<Notice> insertRow(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     Notice row, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.insertRow<Notice>(
+    return databaseAccessor.db.insertRow<Notice>(
       row,
-      transaction: transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<List<Notice>> update(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     List<Notice> rows, {
     _i1.ColumnSelections<NoticeTable>? columns,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.update<Notice>(
+    return databaseAccessor.db.update<Notice>(
       rows,
       columns: columns?.call(Notice.t),
-      transaction: transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<Notice> updateRow(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     Notice row, {
     _i1.ColumnSelections<NoticeTable>? columns,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.updateRow<Notice>(
+    return databaseAccessor.db.updateRow<Notice>(
       row,
       columns: columns?.call(Notice.t),
-      transaction: transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<List<Notice>> delete(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     List<Notice> rows, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.delete<Notice>(
+    return databaseAccessor.db.delete<Notice>(
       rows,
-      transaction: transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<Notice> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     Notice row, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.deleteRow<Notice>(
+    return databaseAccessor.db.deleteRow<Notice>(
       row,
-      transaction: transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<List<Notice>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseAccessor databaseAccessor, {
     required _i1.WhereExpressionBuilder<NoticeTable> where,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.deleteWhere<Notice>(
+    return databaseAccessor.db.deleteWhere<Notice>(
       where: where(Notice.t),
-      transaction: transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseAccessor databaseAccessor, {
     _i1.WhereExpressionBuilder<NoticeTable>? where,
     int? limit,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.count<Notice>(
+    return databaseAccessor.db.count<Notice>(
       where: where?.call(Notice.t),
       limit: limit,
-      transaction: transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 }
@@ -433,7 +433,7 @@ class NoticeAttachRowRepository {
   const NoticeAttachRowRepository._();
 
   Future<void> userInfo(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     Notice notice,
     _i2.UserInfo userInfo, {
     _i1.Transaction? transaction,
@@ -446,10 +446,10 @@ class NoticeAttachRowRepository {
     }
 
     var $notice = notice.copyWith(userInfoId: userInfo.id);
-    await session.db.updateRow<Notice>(
+    await databaseAccessor.db.updateRow<Notice>(
       $notice,
       columns: [Notice.t.userInfoId],
-      transaction: transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 }
