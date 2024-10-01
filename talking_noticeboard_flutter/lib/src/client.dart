@@ -8,9 +8,12 @@ const clientProtocol = String.fromEnvironment('client_protocol');
 /// The hostname to use for the [client].
 const clientHostname = String.fromEnvironment('client_hostname');
 
+/// The port the [client] should connect on.
+const clientPort = String.fromEnvironment('client_port');
+
 /// The client to use.
 final client = Client(
-  '$clientProtocol://$clientHostname:6080/',
+  '$clientProtocol://$clientHostname:$clientPort/',
   authenticationKeyManager: FlutterAuthenticationKeyManager(),
 )..connectivityMonitor = FlutterConnectivityMonitor();
 
