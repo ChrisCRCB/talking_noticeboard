@@ -53,7 +53,7 @@ class HomePageState extends ConsumerState<HomePage> {
   SoundHandle? _soundHandle;
 
   /// The time the notices were last skipped.
-  DateTime? _lastSkipped;
+  late DateTime lastSkipped;
 
   /// Initialise state.
   @override
@@ -75,6 +75,7 @@ class HomePageState extends ConsumerState<HomePage> {
       },
     );
     noticeIndex = 0;
+    lastSkipped = DateTime.now();
   }
 
   /// Dispose of the widget.
@@ -169,10 +170,8 @@ class HomePageState extends ConsumerState<HomePage> {
         autofocus: true,
         onKeyEvent: (final node, final event) {
           final now = DateTime.now();
-          final lastSkipped = _lastSkipped;
-          if (lastSkipped == null ||
-              now.difference(lastSkipped) > widget.noticeSkipInterval) {
-            _lastSkipped = now;
+          if (now.difference(lastSkipped) > widget.noticeSkipInterval) {
+            lastSkipped = now;
             noticeIndex++;
             setState(() {});
             return KeyEventResult.handled;
