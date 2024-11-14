@@ -6,7 +6,7 @@ part of 'providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$ttsHash() => r'1d6ce0c7d32aabc12b4a43f6eab894740fe66541';
+String _$ttsHash() => r'ce178b094d7c0df7359bee8c49233fc670d4cd50';
 
 /// Provide the TTS system.
 ///
@@ -21,8 +21,10 @@ final ttsProvider = AutoDisposeProvider<FlutterTts>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef TtsRef = AutoDisposeProviderRef<FlutterTts>;
-String _$sharedPreferencesHash() => r'c0d827a60771a7c37a7c0952274b865aca9b7784';
+String _$sharedPreferencesHash() => r'bfd7692d9a9925d260646966903da64b5e0f2400';
 
 /// Provide the shared preferences instance.
 ///
@@ -39,6 +41,8 @@ final sharedPreferencesProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef SharedPreferencesRef = AutoDisposeProviderRef<SharedPreferencesAsync>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
