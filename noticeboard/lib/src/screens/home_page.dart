@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_audio_games/flutter_audio_games.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
@@ -59,6 +60,7 @@ class HomePageState extends ConsumerState<HomePage> {
   @override
   void initState() {
     super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     _locationTimer = Timer.periodic(
       widget.locationSoundDelay,
       (final timer) {
@@ -166,6 +168,7 @@ class HomePageState extends ConsumerState<HomePage> {
       }
     }
     return Material(
+      color: Colors.black,
       child: Focus(
         autofocus: true,
         onKeyEvent: (final node, final event) {
