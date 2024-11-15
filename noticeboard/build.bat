@@ -1,0 +1,2 @@
+@echo off
+flutter clean & flutter pub get & flutter build windows --release & cp C:\Windows\System32\msvcp140.dll C:\Windows\System32\vcruntime140.dll C:\Windows\System32\vcruntime140_1.dll build\windows\x64\runner\release
