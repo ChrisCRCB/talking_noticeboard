@@ -162,7 +162,7 @@ class HomePageState extends ConsumerState<HomePage> {
             final day = now.day.toString().padLeft(2, '0');
             final directory = Directory(
               path.join(
-                widget.noticesDirectory.path,
+                widget.noticesDirectory.parent.path,
                 telemetryDirectoryName,
               ),
             );
