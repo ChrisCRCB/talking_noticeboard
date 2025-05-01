@@ -131,7 +131,7 @@ class HomePageState extends ConsumerState<HomePage> {
         }
         notice = notices[noticeIndex];
       }
-    } on PathNotFoundException {
+    } on FileSystemException {
       notice = Notice(
         text:
             'No notices could be loaded from ${widget.noticesDirectory.path}.',
