@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -68,7 +69,6 @@ class HomePageState extends ConsumerState<HomePage> {
           context.playSound(
             Assets.sounds.location.asSound(
               destroy: true,
-              soundType: SoundType.asset,
             ),
           );
         } else {
@@ -138,7 +138,7 @@ class HomePageState extends ConsumerState<HomePage> {
             'No notices could be loaded from ${widget.noticesDirectory.path}.',
       );
       context.playSound(
-        Assets.sounds.error.asSound(destroy: true, soundType: SoundType.asset),
+        Assets.sounds.error.asSound(destroy: true),
       );
     }
     _soundHandle?.stop();
@@ -147,25 +147,7 @@ class HomePageState extends ConsumerState<HomePage> {
     if (soundPath == null) {
       speak(notice.text);
     } else {
-      tts.stop();
-      try {
-        context
-            .playSound(
-              soundPath.asSound(
-                destroy: false,
-                soundType: SoundType.file,
-              ),
-            )
-            .then((final handle) => _soundHandle = handle);
-        // ignore: avoid_catches_without_on_clauses
-      } catch (e) {
-        context
-            .playSound(
-              Assets.sounds.error
-                  .asSound(destroy: false, soundType: SoundType.file),
-            )
-            .then((final handle) => _soundHandle = handle);
-      }
+      playNoticeSound(soundPath);
     }
     return Material(
       color: Colors.black,
@@ -176,6 +158,31 @@ class HomePageState extends ConsumerState<HomePage> {
           if (now.difference(lastSkipped) > widget.noticeSkipInterval) {
             lastSkipped = now;
             noticeIndex++;
+            final month = now.month.toString().padLeft(2, '0');
+            final day = now.day.toString().padLeft(2, '0');
+            final directory = Directory(
+              path.join(
+                widget.noticesDirectory.path,
+                telemetryDirectoryName,
+              ),
+            );
+            final file = File(
+              path.join(
+                directory.path,
+                '${now.year}-$month-$day - $telemetryFilename',
+              ),
+            );
+            try {
+              if (!directory.existsSync()) {
+                directory.createSync(recursive: true);
+              }
+              file.openSync(mode: FileMode.append)
+                ..writeStringSync('${jsonEncode(now)}\n')
+                ..closeSync();
+              // ignore: avoid_catches_without_on_clauses
+            } catch (e) {
+              // We can't write telemetry. It's not the end of the world.
+            }
             setState(() {});
             return KeyEventResult.handled;
           }
@@ -197,5 +204,27 @@ class HomePageState extends ConsumerState<HomePage> {
   Future<void> speak(final String text) async {
     await tts.stop();
     await tts.speak(text);
+  }
+
+  /// Play the notice sound from [soundPath].
+  Future<void> playNoticeSound(final String soundPath) async {
+    unawaited(tts.stop());
+    try {
+      _soundHandle = await context.playSound(
+        soundPath.asSound(
+          destroy: false,
+          soundType: SoundType.file,
+        ),
+      );
+      // ignore: avoid_catches_without_on_clauses
+    } catch (e) {
+      _soundHandle = null;
+      if (mounted) {
+        _soundHandle = await context.playSound(
+          Assets.sounds.error
+              .asSound(destroy: false, soundType: SoundType.file),
+        );
+      }
+    }
   }
 }
