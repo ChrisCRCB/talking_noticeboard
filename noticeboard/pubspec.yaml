@@ -9,13 +9,13 @@ environment:
 
 dependencies:
   auto_size_text: ^3.0.0
-  backstreets_widgets: ^0.23.1
+  backstreets_widgets: ^0.34.0
   cupertino_icons: ^1.0.8
   flutter:
     sdk: flutter
-  flutter_audio_games: ^0.31.0
+  flutter_audio_games: ^0.47.0
   flutter_riverpod: ^2.5.3
-  flutter_soloud: ^2.1.5
+  flutter_soloud: ^3.1.7
   flutter_tts: ^4.0.2
   json_annotation: ^4.9.0
   path: ^1.9.0
