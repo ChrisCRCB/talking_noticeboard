@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -176,12 +175,18 @@ class HomePageState extends ConsumerState<HomePage> {
               if (!directory.existsSync()) {
                 directory.createSync(recursive: true);
               }
-              file.openSync(mode: FileMode.append)
-                ..writeStringSync('${jsonEncode(now)}\n')
-                ..closeSync();
+              final string = '${now.toIso8601String()}\n';
+              if (file.existsSync()) {
+                file.openSync(mode: FileMode.append)
+                  ..writeStringSync(string)
+                  ..flushSync()
+                  ..closeSync();
+              } else {
+                file.writeAsStringSync(string);
+              }
               // ignore: avoid_catches_without_on_clauses
             } catch (e) {
-              // We can't write telemetry. It's not the end of the world.
+              print(e);
             }
             setState(() {});
             return KeyEventResult.handled;
