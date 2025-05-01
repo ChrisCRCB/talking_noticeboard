@@ -185,8 +185,8 @@ class HomePageState extends ConsumerState<HomePage> {
                 file.writeAsStringSync(string);
               }
               // ignore: avoid_catches_without_on_clauses
-            } catch (e) {
-              print(e);
+            } catch (_) {
+              // Do nothing.
             }
             setState(() {});
             return KeyEventResult.handled;
