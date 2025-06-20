@@ -15,8 +15,9 @@ String _$ttsHash() => r'ce178b094d7c0df7359bee8c49233fc670d4cd50';
 final ttsProvider = AutoDisposeProvider<FlutterTts>.internal(
   tts,
   name: r'ttsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$ttsHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$ttsHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -32,14 +33,14 @@ String _$sharedPreferencesHash() => r'bfd7692d9a9925d260646966903da64b5e0f2400';
 @ProviderFor(sharedPreferences)
 final sharedPreferencesProvider =
     AutoDisposeProvider<SharedPreferencesAsync>.internal(
-  sharedPreferences,
-  name: r'sharedPreferencesProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$sharedPreferencesHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+      sharedPreferences,
+      name: r'sharedPreferencesProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$sharedPreferencesHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element

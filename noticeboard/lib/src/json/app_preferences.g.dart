@@ -7,11 +7,7 @@ part of 'app_preferences.dart';
 // **************************************************************************
 
 AppPreferences _$AppPreferencesFromJson(Map<String, dynamic> json) =>
-    AppPreferences(
-      fontSize: (json['fontSize'] as num?)?.toInt() ?? 400,
-    );
+    AppPreferences(fontSize: (json['fontSize'] as num?)?.toInt() ?? 400);
 
 Map<String, dynamic> _$AppPreferencesToJson(AppPreferences instance) =>
-    <String, dynamic>{
-      'fontSize': instance.fontSize,
-    };
+    <String, dynamic>{'fontSize': instance.fontSize};

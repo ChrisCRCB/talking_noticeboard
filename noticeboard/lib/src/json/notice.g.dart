@@ -7,11 +7,11 @@ part of 'notice.dart';
 // **************************************************************************
 
 Notice _$NoticeFromJson(Map<String, dynamic> json) => Notice(
-      text: json['text'] as String,
-      soundPath: json['soundPath'] as String?,
-    );
+  text: json['text'] as String,
+  soundPath: json['soundPath'] as String?,
+);
 
 Map<String, dynamic> _$NoticeToJson(Notice instance) => <String, dynamic>{
-      'text': instance.text,
-      'soundPath': instance.soundPath,
-    };
+  'text': instance.text,
+  'soundPath': instance.soundPath,
+};
