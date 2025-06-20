@@ -21,7 +21,7 @@ class $SoundsGen {
 }
 
 class Assets {
-  Assets._();
+  const Assets._();
 
   static const $SoundsGen sounds = $SoundsGen();
 }
