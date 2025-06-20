@@ -61,20 +61,13 @@ class HomePageState extends ConsumerState<HomePage> {
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
-    _locationTimer = Timer.periodic(
-      widget.locationSoundDelay,
-      (final timer) {
-        if (context.mounted) {
-          context.playSound(
-            Assets.sounds.location.asSound(
-              destroy: true,
-            ),
-          );
-        } else {
-          timer.cancel();
-        }
-      },
-    );
+    _locationTimer = Timer.periodic(widget.locationSoundDelay, (final timer) {
+      if (context.mounted) {
+        context.playSound(Assets.sounds.location.asSound(destroy: true));
+      } else {
+        timer.cancel();
+      }
+    });
     noticeIndex = 0;
     lastSkipped = DateTime.now();
   }
@@ -97,32 +90,33 @@ class HomePageState extends ConsumerState<HomePage> {
           .whereType<Directory>()
           .where((final subdirectory) => subdirectory.listSync().isNotEmpty)
           .map((final subdirectory) {
-        final files = subdirectory.listSync().whereType<File>().toList();
-        String text;
-        try {
-          final file = files.firstWhere(
-            (final file) => path.extension(file.path) == '.txt',
-          );
-          text = file.readAsStringSync();
-          // ignore: avoid_catching_errors
-        } on StateError {
-          text =
-              // ignore: lines_longer_than_80_chars
-              'No file found. Make sure your notice is created in notepad, and the file is stored with a .txt extension.';
-        }
-        String? soundFilePath;
-        try {
-          final soundFile = files.firstWhere(
-            (final file) =>
-                audioFileExtensions.contains(path.extension(file.path)),
-          );
-          soundFilePath = soundFile.path;
-          // ignore: avoid_catching_errors
-        } on StateError {
-          // soundFilePath = null;
-        }
-        return Notice(text: text, soundPath: soundFilePath);
-      }).toList();
+            final files = subdirectory.listSync().whereType<File>().toList();
+            String text;
+            try {
+              final file = files.firstWhere(
+                (final file) => path.extension(file.path) == '.txt',
+              );
+              text = file.readAsStringSync();
+              // ignore: avoid_catching_errors
+            } on StateError {
+              text =
+                  // ignore: lines_longer_than_80_chars
+                  'No file found. Make sure your notice is created in notepad, and the file is stored with a .txt extension.';
+            }
+            String? soundFilePath;
+            try {
+              final soundFile = files.firstWhere(
+                (final file) =>
+                    audioFileExtensions.contains(path.extension(file.path)),
+              );
+              soundFilePath = soundFile.path;
+              // ignore: avoid_catching_errors
+            } on StateError {
+              // soundFilePath = null;
+            }
+            return Notice(text: text, soundPath: soundFilePath);
+          })
+          .toList();
       if (notices.isEmpty) {
         notice = const Notice(text: 'There are no notices to display.');
       } else {
@@ -136,9 +130,7 @@ class HomePageState extends ConsumerState<HomePage> {
         text:
             'No notices could be loaded from ${widget.noticesDirectory.path}.',
       );
-      context.playSound(
-        Assets.sounds.error.asSound(destroy: true),
-      );
+      context.playSound(Assets.sounds.error.asSound(destroy: true));
     }
     _soundHandle?.stop();
     _soundHandle = null;
@@ -216,18 +208,16 @@ class HomePageState extends ConsumerState<HomePage> {
     unawaited(tts.stop());
     try {
       _soundHandle = await context.playSound(
-        soundPath.asSound(
-          destroy: false,
-          soundType: SoundType.file,
-        ),
+        File(
+          soundPath,
+        ).asSound(destroy: false, loadMode: LoadMode.disk, volume: 1.5),
       );
       // ignore: avoid_catches_without_on_clauses
     } catch (e) {
       _soundHandle = null;
       if (mounted) {
         _soundHandle = await context.playSound(
-          Assets.sounds.error
-              .asSound(destroy: false, soundType: SoundType.file),
+          Assets.sounds.error.asSound(destroy: false),
         );
       }
     }
