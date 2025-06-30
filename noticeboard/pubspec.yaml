@@ -13,7 +13,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter:
     sdk: flutter
-  flutter_audio_games: ^0.48.1
+  flutter_audio_games: ^0.48.2
   flutter_soloud: ^3.1.7
   json_annotation: ^4.9.0
   path: ^1.9.0
