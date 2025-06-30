@@ -1,9 +1,8 @@
 import 'dart:io';
 
+import 'package:backstreets_widgets/screens.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_audio_games/flutter_audio_games.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'src/screens/home_page.dart';
@@ -25,7 +24,7 @@ Future<void> main() async {
     });
   }
 
-  runApp(const ProviderScope(child: MyApp()));
+  runApp(const MyApp());
 }
 
 /// The top-level app class.
@@ -36,7 +35,8 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(final BuildContext context) {
-    RendererBinding.instance.ensureSemantics();
+    const variableName = 'NOTICES_DIR';
+    final noticesDirectory = Platform.environment[variableName];
     return SoLoudScope(
       child: MaterialApp(
         title: 'Noticeboard',
@@ -46,9 +46,14 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: Colors.black,
           useMaterial3: true,
         ),
-        home: HomePage(
-          noticesDirectory: Directory(r'd:\notices'),
-        ),
+        home: noticesDirectory == null || noticesDirectory.isEmpty
+            ? ErrorScreen(
+                error: UnsupportedError(
+                  // ignore: lines_longer_than_80_chars
+                  'You must first set the `$variableName` environment variable.',
+                ),
+              )
+            : HomePage(noticesDirectory: Directory(noticesDirectory)),
       ),
     );
   }

@@ -4,19 +4,17 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_audio_games/flutter_audio_games.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import 'package:path/path.dart' as path;
+import 'package:stts/stts.dart';
 
 import '../../gen/assets.gen.dart';
 import '../constants.dart';
 import '../json/notice.dart';
-import '../providers.dart';
 import '../widgets/notice_text.dart';
 
 /// The home page.
-class HomePage extends ConsumerStatefulWidget {
+class HomePage extends StatefulWidget {
   /// Create an instance.
   const HomePage({
     required this.noticesDirectory,
@@ -40,15 +38,15 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 /// State for [HomePage].
-class HomePageState extends ConsumerState<HomePage> {
+class HomePageState extends State<HomePage> {
+  /// The TTS system to use.
+  late final Tts tts;
+
   /// The timer for playing location sounds.
   late final Timer _locationTimer;
 
   /// The index of the current notice.
   late int noticeIndex;
-
-  /// The TTS to use.
-  late FlutterTts tts;
 
   /// The sound handle of the currently-playing sound.
   SoundHandle? _soundHandle;
@@ -61,6 +59,7 @@ class HomePageState extends ConsumerState<HomePage> {
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+    tts = Tts();
     _locationTimer = Timer.periodic(widget.locationSoundDelay, (final timer) {
       if (context.mounted) {
         context.playSound(Assets.sounds.location.asSound(destroy: true));
@@ -76,13 +75,15 @@ class HomePageState extends ConsumerState<HomePage> {
   @override
   void dispose() {
     super.dispose();
+    tts
+      ..stop()
+      ..dispose();
     _locationTimer.cancel();
   }
 
   /// Build a widget.
   @override
   Widget build(final BuildContext context) {
-    tts = ref.watch(ttsProvider);
     Notice notice;
     try {
       final notices = widget.noticesDirectory
@@ -200,7 +201,7 @@ class HomePageState extends ConsumerState<HomePage> {
   /// Speak some [text].
   Future<void> speak(final String text) async {
     await tts.stop();
-    await tts.speak(text);
+    await tts.start(text);
   }
 
   /// Play the notice sound from [soundPath].

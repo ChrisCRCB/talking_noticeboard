@@ -4,13 +4,6 @@ A serverless talking noticeboard.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+First set the `NOTICES_DIR` environment variable to the path of your notices, then run the program.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Your notices should be in subdirectories of the directory stored in `NOTICES_DIR`. Each subdirectory should have at least a text file with a `.txt` extension. Optionally, it can also have a sound file of type `.wav`, `.mp3`, or `.ogg`.
