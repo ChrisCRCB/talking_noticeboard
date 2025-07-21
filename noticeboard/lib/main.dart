@@ -1,8 +1,11 @@
 import 'dart:io';
 
 import 'package:backstreets_widgets/screens.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_audio_games/flutter_audio_games.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'src/screens/home_page.dart';
@@ -23,6 +26,38 @@ Future<void> main() async {
       await windowManager.focus();
     });
   }
+
+  FlutterError
+      .presentError = (final details, {final forceReport = false}) async {
+    final now = DateTime.now();
+    final month = now.month.toString().padLeft(2, '0');
+    final day = now.day.toString().padLeft(2, '0');
+    final directory = await getDownloadsDirectory();
+    if (directory == null) {
+      exit(255);
+    }
+    final file = File(
+      path.join(directory.path, 'errors - ${now.year}-$month-$day.txt'),
+    );
+    try {
+      final renderer = TextTreeRenderer();
+      final string = renderer
+          .render(details.toDiagnosticsNode(style: DiagnosticsTreeStyle.error))
+          .trimRight();
+      debugPrint(string);
+      if (file.existsSync()) {
+        file.openSync(mode: FileMode.append)
+          ..writeStringSync(string)
+          ..flushSync()
+          ..closeSync();
+      } else {
+        file.writeAsStringSync(string);
+      }
+      // ignore: avoid_catches_without_on_clauses
+    } catch (_) {
+      exit(1);
+    }
+  };
 
   runApp(const MyApp());
 }
