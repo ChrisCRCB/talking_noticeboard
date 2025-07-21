@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_audio_games/flutter_audio_games.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:path/path.dart' as path;
-import 'package:stts/stts.dart';
 
 import '../../gen/assets.gen.dart';
 import '../constants.dart';
@@ -40,7 +40,7 @@ class HomePage extends StatefulWidget {
 /// State for [HomePage].
 class HomePageState extends State<HomePage> {
   /// The TTS system to use.
-  late final Tts tts;
+  late final FlutterTts tts;
 
   /// The timer for playing location sounds.
   late final Timer _locationTimer;
@@ -59,7 +59,7 @@ class HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
-    tts = Tts();
+    tts = FlutterTts();
     _locationTimer = Timer.periodic(widget.locationSoundDelay, (final timer) {
       if (context.mounted) {
         context.playSound(Assets.sounds.location.asSound(destroy: true));
@@ -75,9 +75,7 @@ class HomePageState extends State<HomePage> {
   @override
   void dispose() {
     super.dispose();
-    tts
-      ..stop()
-      ..dispose();
+    tts.stop();
     _locationTimer.cancel();
   }
 
@@ -201,7 +199,7 @@ class HomePageState extends State<HomePage> {
   /// Speak some [text].
   Future<void> speak(final String text) async {
     await tts.stop();
-    await tts.start(text);
+    await tts.speak(text);
   }
 
   /// Play the notice sound from [soundPath].
