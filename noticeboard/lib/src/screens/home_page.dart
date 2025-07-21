@@ -181,10 +181,8 @@ class HomePageState extends State<HomePage> {
             }
             setState(() {});
             return KeyEventResult.handled;
-          } else {
-            throw Exception('I wanted this also to happen.');
           }
-          // return KeyEventResult.ignored;
+          return KeyEventResult.ignored;
         },
         child: DefaultTextStyle(
           style: const TextStyle(
