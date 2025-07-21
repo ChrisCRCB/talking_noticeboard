@@ -209,7 +209,7 @@ class HomePageState extends State<HomePage> {
       _soundHandle = await context.playSound(
         File(
           soundPath,
-        ).asSound(destroy: false, loadMode: LoadMode.disk, volume: 1.5),
+        ).asSound(destroy: false, loadMode: LoadMode.disk, volume: 1.0),
       );
       // ignore: avoid_catches_without_on_clauses
     } catch (e) {
