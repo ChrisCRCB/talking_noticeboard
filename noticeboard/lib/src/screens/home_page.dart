@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_audio_games/flutter_audio_games.dart';
-import 'package:flutter_soloud/flutter_soloud.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import 'package:path/path.dart' as path;
+import 'package:stts/stts.dart';
 
 import '../../gen/assets.gen.dart';
 import '../constants.dart';
@@ -40,7 +39,7 @@ class HomePage extends StatefulWidget {
 /// State for [HomePage].
 class HomePageState extends State<HomePage> {
   /// The TTS system to use.
-  late final FlutterTts tts;
+  late final Tts tts;
 
   /// The timer for playing location sounds.
   late final Timer _locationTimer;
@@ -49,7 +48,7 @@ class HomePageState extends State<HomePage> {
   late int noticeIndex;
 
   /// The sound handle of the currently-playing sound.
-  SoundHandle? _soundHandle;
+  late final AudioPlayer _audioPlayer;
 
   /// The time the notices were last skipped.
   late DateTime lastSkipped;
@@ -59,10 +58,13 @@ class HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
-    tts = FlutterTts();
+    tts = Tts();
+    _audioPlayer = AudioPlayer();
     _locationTimer = Timer.periodic(widget.locationSoundDelay, (final timer) {
       if (context.mounted) {
-        context.playSound(Assets.sounds.location.asSound(destroy: true));
+        if (_audioPlayer.state != PlayerState.playing) {
+          _audioPlayer.play(AssetSource(Assets.sounds.location));
+        }
       } else {
         timer.cancel();
       }
@@ -77,6 +79,7 @@ class HomePageState extends State<HomePage> {
     super.dispose();
     tts.stop();
     _locationTimer.cancel();
+    _audioPlayer.dispose();
   }
 
   /// Build a widget.
@@ -123,21 +126,20 @@ class HomePageState extends State<HomePage> {
           noticeIndex = 0;
         }
         notice = notices[noticeIndex];
+        final soundPath = notice.soundPath;
+        if (soundPath == null) {
+          speak(notice.text);
+        } else {
+          playNoticeSound(soundPath);
+        }
       }
     } on FileSystemException {
       notice = Notice(
         text:
             'No notices could be loaded from ${widget.noticesDirectory.path}.',
       );
-      context.playSound(Assets.sounds.error.asSound(destroy: true));
-    }
-    _soundHandle?.stop();
-    _soundHandle = null;
-    final soundPath = notice.soundPath;
-    if (soundPath == null) {
       speak(notice.text);
-    } else {
-      playNoticeSound(soundPath);
+      _audioPlayer.play(AssetSource(Assets.sounds.error));
     }
     return Material(
       color: Colors.black,
@@ -199,25 +201,18 @@ class HomePageState extends State<HomePage> {
   /// Speak some [text].
   Future<void> speak(final String text) async {
     await tts.stop();
-    await tts.speak(text);
+    await tts.start(text);
   }
 
   /// Play the notice sound from [soundPath].
   Future<void> playNoticeSound(final String soundPath) async {
     unawaited(tts.stop());
     try {
-      _soundHandle = await context.playSound(
-        File(
-          soundPath,
-        ).asSound(destroy: false, loadMode: LoadMode.disk, volume: 1.0),
-      );
+      await _audioPlayer.play(DeviceFileSource(soundPath));
       // ignore: avoid_catches_without_on_clauses
     } catch (e) {
-      _soundHandle = null;
       if (mounted) {
-        _soundHandle = await context.playSound(
-          Assets.sounds.error.asSound(destroy: false),
-        );
+        await _audioPlayer.play(AssetSource(Assets.sounds.error));
       }
     }
   }

@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:backstreets_widgets/screens.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_audio_games/flutter_audio_games.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:window_manager/window_manager.dart';
@@ -72,24 +71,22 @@ class MyApp extends StatelessWidget {
   Widget build(final BuildContext context) {
     const variableName = 'NOTICES_DIR';
     final noticesDirectory = Platform.environment[variableName];
-    return SoLoudScope(
-      child: MaterialApp(
-        title: 'Noticeboard',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          brightness: Brightness.dark,
-          scaffoldBackgroundColor: Colors.black,
-          useMaterial3: true,
-        ),
-        home: noticesDirectory == null || noticesDirectory.isEmpty
-            ? ErrorScreen(
-                error: UnsupportedError(
-                  // ignore: lines_longer_than_80_chars
-                  'You must first set the `$variableName` environment variable.',
-                ),
-              )
-            : HomePage(noticesDirectory: Directory(noticesDirectory)),
+    return MaterialApp(
+      title: 'Noticeboard',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: Colors.black,
+        useMaterial3: true,
       ),
+      home: noticesDirectory == null || noticesDirectory.isEmpty
+          ? ErrorScreen(
+              error: UnsupportedError(
+                // ignore: lines_longer_than_80_chars
+                'You must first set the `$variableName` environment variable.',
+              ),
+            )
+          : HomePage(noticesDirectory: Directory(noticesDirectory)),
     );
   }
 }
