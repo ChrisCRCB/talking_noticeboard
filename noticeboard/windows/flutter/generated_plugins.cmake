@@ -4,8 +4,8 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   audioplayers_windows
+  flutter_tts
   screen_retriever_windows
-  stts
   window_manager
 )
 

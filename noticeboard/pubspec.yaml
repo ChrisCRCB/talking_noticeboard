@@ -8,16 +8,16 @@ environment:
   sdk: ^3.10.0-75.1.beta
 
 dependencies:
-  audioplayers: 6.2.0
+  audioplayers: ^6.5.1
   auto_size_text: ^3.0.0
-  backstreets_widgets: ^0.37.0
+  backstreets_widgets: ^0.41.1
   cupertino_icons: ^1.0.8
   flutter:
     sdk: flutter
+  flutter_tts: ^4.2.5
   json_annotation: ^4.9.0
   path: ^1.9.1
   path_provider: ^2.1.5
-  stts: ^1.2.6
   window_manager: ^0.5.1
 
 dev_dependencies:
